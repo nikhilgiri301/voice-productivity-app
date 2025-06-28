@@ -1,0 +1,40 @@
+{
+  "name": "personal-organizer",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Voice-first productivity organizer with AI-powered natural language processing",
+  "keywords": [
+    "productivity",
+    "voice",
+    "ai",
+    "pwa",
+    "organizer"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "lint": "echo 'Linting would go here'",
+    "test": "echo 'Tests would go here'",
+    "build:prod": "npm run type-check && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.4",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.50.2",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.523.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
+}
