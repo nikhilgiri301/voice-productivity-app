@@ -3652,7 +3652,6 @@ export const TestVisualsPage: React.FC<TestVisualsPageProps> = ({ onBack }) => {
             border: '1px solid rgba(255, 255, 255, 0.08)',
             flex: 1,
             overflow: 'auto',
-            scrollbarGutter: 'stable', // Reserve space for scrollbar
           }}>
         {/* Schedule Tab */}
         {activeTab === 'schedule' && (
@@ -4235,15 +4234,17 @@ export const TestVisualsPage: React.FC<TestVisualsPageProps> = ({ onBack }) => {
         {/* Tasks Tab */}
         {activeTab === 'tasks' && (
           <div>
-            {/* Date Navigation & Priority Filters - Schedule Style */}
-            <div style={{ marginBottom: '24px' }}>
-              {/* Date Navigation Section */}
+            {/* Date Navigation & Priority Filters - Matching Schedule Layout */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '16px',
+            }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '16px',
-                padding: '0 4px',
+                gap: '12px',
               }}>
                 {/* Left Arrow */}
                 <button style={{
@@ -4259,9 +4260,9 @@ export const TestVisualsPage: React.FC<TestVisualsPageProps> = ({ onBack }) => {
                   <div style={{
                     width: '0',
                     height: '0',
-                    borderTop: '8px solid transparent',
-                    borderBottom: '8px solid transparent',
-                    borderRight: '12px solid #ffffff',
+                    borderTop: '6px solid transparent',
+                    borderBottom: '6px solid transparent',
+                    borderRight: '8px solid #ffffff',
                   }}></div>
                 </button>
 
@@ -4298,14 +4299,13 @@ export const TestVisualsPage: React.FC<TestVisualsPageProps> = ({ onBack }) => {
                   <div style={{
                     width: '0',
                     height: '0',
-                    borderTop: '8px solid transparent',
-                    borderBottom: '8px solid transparent',
-                    borderLeft: '12px solid #ffffff',
+                    borderTop: '6px solid transparent',
+                    borderBottom: '6px solid transparent',
+                    borderLeft: '8px solid #ffffff',
                   }}></div>
                 </button>
               </div>
 
-              {/* Priority Filter Section */}
               <div style={{
                 display: 'flex',
                 gap: '4px',
@@ -4341,9 +4341,6 @@ export const TestVisualsPage: React.FC<TestVisualsPageProps> = ({ onBack }) => {
                   cursor: 'pointer',
                   fontWeight: '500',
                 }}>Optional</button>
-
-                {/* Spacer */}
-                <div style={{ flex: 1 }}></div>
 
                 {/* Custom Filter Button - Same as Schedule */}
                 <button style={{
