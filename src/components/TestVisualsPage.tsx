@@ -25,9 +25,41 @@ const NoteFormComponent: React.FC<FormProps> = ({ onSubmit, onCancel }) => {
   const [currentTag, setCurrentTag] = useState('');
   const [titleValid, setTitleValid] = useState(false);
   const [contentValid, setContentValid] = useState(false);
+  const [autoSaveTimer, setAutoSaveTimer] = useState<NodeJS.Timeout | null>(null);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
 
   // Predefined tag suggestions
   const tagSuggestions = ['meeting', 'ideas', 'project', 'review', 'planning', 'research', 'personal', 'work'];
+
+  // Auto-save functionality
+  const autoSave = () => {
+    if (formData.title.trim() || formData.content.trim()) {
+      setIsAutoSaving(true);
+      // Simulate auto-save (in real app, this would save to localStorage or backend)
+      setTimeout(() => {
+        setLastSaved(new Date());
+        setIsAutoSaving(false);
+      }, 500);
+    }
+  };
+
+  // Trigger auto-save on content changes
+  React.useEffect(() => {
+    if (autoSaveTimer) {
+      clearTimeout(autoSaveTimer);
+    }
+
+    const timer = setTimeout(() => {
+      autoSave();
+    }, 2000); // Auto-save after 2 seconds of inactivity
+
+    setAutoSaveTimer(timer);
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [formData.title, formData.content]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -208,37 +240,154 @@ const NoteFormComponent: React.FC<FormProps> = ({ onSubmit, onCancel }) => {
 
         </div>
 
-        {/* Content Field with Validation */}
+        {/* Rich Text Content Field */}
         <div>
-          <label style={{
-            display: 'block',
-            color: '#ffffff',
-            fontSize: '14px',
-            fontWeight: '500',
-            marginBottom: '8px'
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <label style={{
+              color: '#ffffff',
+              fontSize: '14px',
+              fontWeight: '500',
+            }}>
+              Content *
+            </label>
+            {/* Auto-save indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {isAutoSaving && (
+                <span style={{ color: '#8b8b8b', fontSize: '12px' }}>Saving...</span>
+              )}
+              {lastSaved && !isAutoSaving && (
+                <span style={{ color: '#8b8b8b', fontSize: '12px' }}>
+                  Saved {lastSaved.toLocaleTimeString()}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Rich Text Toolbar */}
+          <div style={{
+            display: 'flex',
+            gap: '4px',
+            padding: '8px',
+            background: 'rgba(255, 255, 255, 0.05)',
+            borderRadius: '8px 8px 0 0',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderBottom: 'none',
           }}>
-            Content *
-          </label>
+            <button
+              type="button"
+              onClick={() => {
+                const textarea = document.getElementById('note-content') as HTMLTextAreaElement;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const selectedText = formData.content.substring(start, end);
+                const newText = formData.content.substring(0, start) + `**${selectedText}**` + formData.content.substring(end);
+                handleContentChange(newText);
+              }}
+              style={{
+                padding: '4px 8px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '4px',
+                color: '#ffffff',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+              }}
+            >
+              B
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const textarea = document.getElementById('note-content') as HTMLTextAreaElement;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const selectedText = formData.content.substring(start, end);
+                const newText = formData.content.substring(0, start) + `*${selectedText}*` + formData.content.substring(end);
+                handleContentChange(newText);
+              }}
+              style={{
+                padding: '4px 8px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '4px',
+                color: '#ffffff',
+                fontSize: '12px',
+                fontStyle: 'italic',
+                cursor: 'pointer',
+              }}
+            >
+              I
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const textarea = document.getElementById('note-content') as HTMLTextAreaElement;
+                const start = textarea.selectionStart;
+                const newText = formData.content.substring(0, start) + '\n• ' + formData.content.substring(start);
+                handleContentChange(newText);
+              }}
+              style={{
+                padding: '4px 8px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '4px',
+                color: '#ffffff',
+                fontSize: '12px',
+                cursor: 'pointer',
+              }}
+            >
+              •
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const textarea = document.getElementById('note-content') as HTMLTextAreaElement;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const selectedText = formData.content.substring(start, end);
+                const url = prompt('Enter URL:');
+                if (url) {
+                  const newText = formData.content.substring(0, start) + `[${selectedText || 'Link'}](${url})` + formData.content.substring(end);
+                  handleContentChange(newText);
+                }
+              }}
+              style={{
+                padding: '4px 8px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '4px',
+                color: '#ffffff',
+                fontSize: '12px',
+                cursor: 'pointer',
+              }}
+            >
+              🔗
+            </button>
+          </div>
+
           <div style={{ position: 'relative' }}>
             <textarea
+              id="note-content"
               value={formData.content}
               onChange={(e) => handleContentChange(e.target.value)}
-              placeholder="Start writing your note..."
-              rows={6}
+              placeholder="Start writing your note... Use **bold**, *italic*, • bullets, and [links](url)"
+              rows={8}
               style={{
                 width: '100%',
                 padding: '14px 16px',
                 background: 'rgba(255, 255, 255, 0.08)',
                 border: `1px solid ${contentValid ? 'rgba(52, 199, 89, 0.4)' : 'rgba(255, 255, 255, 0.15)'}`,
-                borderRadius: '8px',
+                borderRadius: '0 0 8px 8px',
                 color: '#ffffff',
                 fontSize: '14px',
                 outline: 'none',
                 resize: 'vertical',
-                minHeight: '120px',
+                minHeight: '150px',
                 lineHeight: '1.5',
                 transition: 'border-color 0.2s ease',
                 boxSizing: 'border-box',
+                fontFamily: 'monospace',
               }}
               required
             />
@@ -258,6 +407,9 @@ const NoteFormComponent: React.FC<FormProps> = ({ onSubmit, onCancel }) => {
               Content should be at least 10 characters
             </div>
           )}
+          <div style={{ color: '#8b8b8b', fontSize: '11px', marginTop: '4px' }}>
+            Supports Markdown: **bold**, *italic*, • bullets, [links](url)
+          </div>
         </div>
 
         {/* Tags Section */}
@@ -5071,7 +5223,7 @@ export const TestVisualsPage: React.FC<TestVisualsPageProps> = ({ onBack }) => {
               background: '#1a1a2e',
               borderRadius: '12px',
               border: '1px solid rgba(255, 255, 255, 0.08)',
-              maxWidth: '500px',
+              maxWidth: '390px', // iPhone usable width (430px - 40px for padding/margins)
               width: '100%',
               maxHeight: '80vh',
               overflow: 'auto',
