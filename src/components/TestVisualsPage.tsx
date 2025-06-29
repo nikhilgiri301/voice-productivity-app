@@ -3,86 +3,6 @@ import { Calendar, CheckSquare, FileText, Mic } from 'lucide-react';
 import { GlassCard, GlassButton } from './glass';
 
 // Mock data for visual testing - no functionality
-const mockEvents = [
-  {
-    id: '1',
-    title: 'Team Standup',
-    time: '9:00 AM',
-    duration: '30 min',
-    type: 'meeting',
-    status: 'upcoming',
-    priority: 'medium'
-  },
-  {
-    id: '2',
-    title: 'Client Presentation',
-    time: '2:00 PM',
-    duration: '1 hour',
-    type: 'meeting',
-    status: 'current',
-    priority: 'high'
-  },
-  {
-    id: '3',
-    title: 'Code Review',
-    time: '4:30 PM',
-    duration: '45 min',
-    type: 'work',
-    status: 'upcoming',
-    priority: 'medium'
-  }
-];
-
-const mockTasks = [
-  {
-    id: '1',
-    title: 'Complete project proposal',
-    priority: 'high',
-    dueDate: 'Today',
-    status: 'pending',
-    progress: 75
-  },
-  {
-    id: '2',
-    title: 'Review design mockups',
-    priority: 'medium',
-    dueDate: 'Tomorrow',
-    status: 'pending',
-    progress: 30
-  },
-  {
-    id: '3',
-    title: 'Update documentation',
-    priority: 'optional',
-    dueDate: 'This week',
-    status: 'pending',
-    progress: 0
-  }
-];
-
-const mockNotes = [
-  {
-    id: '1',
-    title: 'Meeting Notes - Q4 Planning',
-    content: 'Key discussion points from quarterly planning session...',
-    tags: ['meeting', 'planning', 'q4'],
-    timestamp: '2 hours ago'
-  },
-  {
-    id: '2',
-    title: 'Project Ideas',
-    content: 'Brainstorming session results for new features...',
-    tags: ['ideas', 'features', 'brainstorm'],
-    timestamp: '1 day ago'
-  },
-  {
-    id: '3',
-    title: 'Research Notes',
-    content: 'Findings from user research interviews...',
-    tags: ['research', 'users', 'insights'],
-    timestamp: '3 days ago'
-  }
-];
 
 interface TestVisualsPageProps {
   onBack?: () => void;
@@ -4857,39 +4777,27 @@ export const TestVisualsPage: React.FC<TestVisualsPageProps> = ({ onBack }) => {
           <div>
             {/* Notes List */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {/* Note 1 - Q4 Planning Meeting Notes */}
+              {/* COPIED Note 1 - Q4 Planning Meeting Notes */}
               <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '12px',
                 background: 'rgba(255, 255, 255, 0.03)',
                 borderRadius: '8px',
                 padding: '12px',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
-                opacity: 0.6,
+                display: 'flex',
+                gap: '12px',
+                alignItems: 'flex-start',
               }}>
-                <input
-                  type="checkbox"
-                  checked
-                  style={{
-                    width: '18px',
-                    height: '18px',
-                    accentColor: '#4CAF50',
-                    marginTop: '2px',
-                  }}
-                />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h3 style={{
                     color: '#ffffff',
                     fontSize: '16px',
                     fontWeight: '500',
                     margin: '0 0 4px 0',
-                    textDecoration: 'line-through',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                   }}>
-                    Send weekly report
+                    Q4 Planning Meeting Notes
                   </h3>
                   <p style={{
                     color: '#8b8b8b',
@@ -4899,213 +4807,44 @@ export const TestVisualsPage: React.FC<TestVisualsPageProps> = ({ onBack }) => {
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    textDecoration: 'line-through',
                   }}>
-                    Compile team metrics and send to management
+                    Strategic objectives, budget allocations, team restructuring plans, and quarterly milestone reviews
                   </p>
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
+                    marginBottom: '8px',
                   }}>
                     <span style={{
                       color: '#8b8b8b',
                       fontSize: '12px',
+                      fontWeight: '400',
                     }}>
-                      Completed 2h ago
+                      2h ago
                     </span>
-                  </div>
-                </div>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  padding: '4px',
-                  minWidth: '24px',
-                  width: '24px',
-                  flexShrink: 0,
-                  alignSelf: 'center',
-                }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ color: '#8b8b8b' }}>
-                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-              </div>
-
-              {/* Task 5 */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '12px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                borderRadius: '8px',
-                padding: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-              }}>
-                <input
-                  type="checkbox"
-                  style={{
-                    width: '18px',
-                    height: '18px',
-                    accentColor: '#4CAF50',
-                    marginTop: '2px',
-                  }}
-                />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h3 style={{
-                    color: '#ffffff',
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    margin: '0 0 4px 0',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}>
-                    Update project timeline
-                  </h3>
-                  <p style={{
-                    color: '#8b8b8b',
-                    fontSize: '14px',
-                    fontWeight: '400',
-                    margin: '0 0 8px 0',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}>
-                    Adjust milestones and deadlines based on recent changes
-                  </p>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                  }}>
                     <span style={{
-                      background: '#f59e0b',
-                      color: '#000000',
+                      background: '#3b82f6',
+                      color: '#ffffff',
                       padding: '2px 8px',
                       borderRadius: '4px',
                       fontSize: '10px',
-                      fontWeight: '600',
+                      fontWeight: '500',
                       textTransform: 'uppercase',
                     }}>
-                      MEDIUM
+                      Meeting
                     </span>
                     <span style={{
-                      color: '#8b8b8b',
-                      fontSize: '12px',
-                    }}>
-                      Due today
-                    </span>
-                    <span style={{
-                      color: '#f59e0b',
-                      fontSize: '12px',
-                      fontWeight: '500',
-                    }}>
-                      by 18:00
-                    </span>
-                    <div style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      background: '#f59e0b',
-                    }}></div>
-                  </div>
-                </div>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  padding: '4px',
-                  minWidth: '24px',
-                  width: '24px',
-                  flexShrink: 0,
-                  alignSelf: 'center',
-                }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ color: '#8b8b8b' }}>
-                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-              </div>
-
-              {/* Task 6 */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '12px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                borderRadius: '8px',
-                padding: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-              }}>
-                <input
-                  type="checkbox"
-                  style={{
-                    width: '18px',
-                    height: '18px',
-                    accentColor: '#4CAF50',
-                    marginTop: '2px',
-                  }}
-                />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h3 style={{
-                    color: '#ffffff',
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    margin: '0 0 4px 0',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}>
-                    Review design mockups
-                  </h3>
-                  <p style={{
-                    color: '#8b8b8b',
-                    fontSize: '14px',
-                    fontWeight: '400',
-                    margin: '0 0 8px 0',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}>
-                    Provide feedback on new interface designs and wireframes
-                  </p>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                  }}>
-                    <span style={{
-                      background: '#f59e0b',
-                      color: '#000000',
+                      background: '#8b5cf6',
+                      color: '#ffffff',
                       padding: '2px 8px',
                       borderRadius: '4px',
                       fontSize: '10px',
-                      fontWeight: '600',
+                      fontWeight: '500',
                       textTransform: 'uppercase',
                     }}>
-                      MEDIUM
+                      Planning
                     </span>
-                    <span style={{
-                      color: '#8b8b8b',
-                      fontSize: '12px',
-                    }}>
-                      Due tomorrow
-                    </span>
-                    <span style={{
-                      color: '#f59e0b',
-                      fontSize: '12px',
-                      fontWeight: '500',
-                    }}>
-                      by 10:00
-                    </span>
-                    <div style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      background: '#10b981',
-                    }}></div>
                   </div>
                 </div>
                 <div style={{
@@ -5125,25 +4864,16 @@ export const TestVisualsPage: React.FC<TestVisualsPageProps> = ({ onBack }) => {
                 </div>
               </div>
 
-              {/* Task 7 */}
+              {/* COPIED Note 2 - Product Ideas Brainstorm */}
               <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '12px',
                 background: 'rgba(255, 255, 255, 0.03)',
                 borderRadius: '8px',
                 padding: '12px',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
+                display: 'flex',
+                gap: '12px',
+                alignItems: 'flex-start',
               }}>
-                <input
-                  type="checkbox"
-                  style={{
-                    width: '18px',
-                    height: '18px',
-                    accentColor: '#4CAF50',
-                    marginTop: '2px',
-                  }}
-                />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h3 style={{
                     color: '#ffffff',
@@ -5154,7 +4884,7 @@ export const TestVisualsPage: React.FC<TestVisualsPageProps> = ({ onBack }) => {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                   }}>
-                    Update project documentation
+                    Product Ideas Brainstorm
                   </h3>
                   <p style={{
                     color: '#8b8b8b',
@@ -5165,36 +4895,119 @@ export const TestVisualsPage: React.FC<TestVisualsPageProps> = ({ onBack }) => {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                   }}>
-                    Revise technical specs and update user guides
+                    Voice-first interface concepts, AI integration possibilities, user feedback analysis from recent surveys
                   </p>
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
+                    marginBottom: '8px',
                   }}>
+                    <span style={{
+                      color: '#8b8b8b',
+                      fontSize: '12px',
+                      fontWeight: '400',
+                    }}>
+                      Yesterday
+                    </span>
                     <span style={{
                       background: '#10b981',
                       color: '#ffffff',
                       padding: '2px 8px',
                       borderRadius: '4px',
                       fontSize: '10px',
-                      fontWeight: '600',
+                      fontWeight: '500',
                       textTransform: 'uppercase',
                     }}>
-                      OPTIONAL
+                      Ideas
                     </span>
+                    <span style={{
+                      background: '#3b82f6',
+                      color: '#ffffff',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontSize: '10px',
+                      fontWeight: '500',
+                      textTransform: 'uppercase',
+                    }}>
+                      Product
+                    </span>
+                  </div>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  minWidth: '24px',
+                  width: '24px',
+                  flexShrink: 0,
+                  alignSelf: 'center',
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ color: '#8b8b8b' }}>
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+              {/* COPIED Note 3 - Research on Competitor Analysis */}
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                borderRadius: '8px',
+                padding: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                display: 'flex',
+                gap: '12px',
+                alignItems: 'flex-start',
+              }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h3 style={{
+                    color: '#ffffff',
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    margin: '0 0 4px 0',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}>
+                    Research on Competitor Analysis
+                  </h3>
+                  <p style={{
+                    color: '#8b8b8b',
+                    fontSize: '14px',
+                    fontWeight: '400',
+                    margin: '0 0 8px 0',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}>
+                    Market positioning studies, feature comparison matrices, pricing analysis, and user experience benchmarks
+                  </p>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '8px',
+                  }}>
                     <span style={{
                       color: '#8b8b8b',
                       fontSize: '12px',
+                      fontWeight: '400',
                     }}>
-                      Due this week
+                      3 days ago
                     </span>
-                    <div style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      background: '#10b981',
-                    }}></div>
+                    <span style={{
+                      background: '#f59e0b',
+                      color: '#000000',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontSize: '10px',
+                      fontWeight: '500',
+                      textTransform: 'uppercase',
+                    }}>
+                      Research
+                    </span>
                   </div>
                 </div>
                 <div style={{
