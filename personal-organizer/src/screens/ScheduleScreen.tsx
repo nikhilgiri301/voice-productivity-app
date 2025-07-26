@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   DayNavigation,
   ScheduleFilters,
@@ -6,6 +6,7 @@ import {
   type ScheduleFilterType,
   type EventData,
 } from '@/components/schedule';
+import { formatDate, isToday } from '@/utils/dates';
 
 const ScheduleScreen: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -67,6 +68,16 @@ const ScheduleScreen: React.FC = () => {
     setCurrentDate(date);
   };
 
+  // Get formatted date for display
+  const formattedDate = useMemo(() => {
+    return formatDate(currentDate, 'long');
+  }, [currentDate]);
+
+  // Check if current date is today for special styling
+  const isCurrentDateToday = useMemo(() => {
+    return isToday(currentDate);
+  }, [currentDate]);
+
   const handleFilterChange = (filter: ScheduleFilterType): void => {
     setActiveFilter(filter);
   };
@@ -81,8 +92,13 @@ const ScheduleScreen: React.FC = () => {
       {/* Screen Header */}
       <div className='text-center mb-6'>
         <h1 className='text-section-header text-text-primary mb-2'>Schedule</h1>
-        <p className='text-secondary text-text-secondary'>
+        <p className='text-secondary text-text-secondary mb-1'>
           Your meetings and appointments
+        </p>
+        <p className={`text-micro font-medium ${
+          isCurrentDateToday ? 'text-accent' : 'text-text-secondary'
+        }`}>
+          {isCurrentDateToday ? 'Today • ' : ''}{formattedDate}
         </p>
       </div>
 

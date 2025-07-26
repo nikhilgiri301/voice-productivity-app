@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -25,13 +25,13 @@ const AppContent: React.FC = () => {
 
   const activeTab = getActiveTabFromPath(location.pathname);
 
-  const handleTabChange = (tabId: TabId): void => {
+  const handleTabChange = useCallback((tabId: TabId): void => {
     navigate(`/${tabId}`);
-  };
+  }, [navigate]);
 
-  const handleContextChange = (context: ContextMode): void => {
+  const handleContextChange = useCallback((context: ContextMode): void => {
     setCurrentContext(context);
-  };
+  }, []);
 
   return (
     <Layout

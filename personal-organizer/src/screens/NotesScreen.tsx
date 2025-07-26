@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   SearchBar,
   TagFilterArea,
@@ -281,46 +281,46 @@ Don't forget to check for sales on organic produce!`,
     archived: sampleNotes.filter(note => note.isArchived).length,
   };
 
-  const handleSearchChange = (value: string): void => {
+  const handleSearchChange = useCallback((value: string): void => {
     setSearchQuery(value);
-  };
+  }, []);
 
-  const handleSearchSubmit = (query: string): void => {
+  const handleSearchSubmit = useCallback((query: string): void => {
     // Search submit functionality will be implemented in Phase 3
     console.log('Search submitted:', query);
-  };
+  }, []);
 
-  const handleTagToggle = (tagName: string): void => {
+  const handleTagToggle = useCallback((tagName: string): void => {
     setSelectedTags(prev =>
       prev.includes(tagName)
         ? prev.filter(tag => tag !== tagName)
         : [...prev, tagName]
     );
-  };
+  }, []);
 
-  const handleClearAllTags = (): void => {
+  const handleClearAllTags = useCallback((): void => {
     setSelectedTags([]);
-  };
+  }, []);
 
-  const handleViewChange = (view: ViewMode): void => {
+  const handleViewChange = useCallback((view: ViewMode): void => {
     setCurrentView(view);
     setSelectedTags([]); // Clear tag filters when switching views
-  };
+  }, []);
 
-  const handleNoteClick = (note: NoteData): void => {
+  const handleNoteClick = useCallback((note: NoteData): void => {
     // Note click functionality will be implemented in Phase 3
     console.log('Note clicked:', note.title);
-  };
+  }, []);
 
-  const handleNotePin = (noteId: string): void => {
+  const handleNotePin = useCallback((noteId: string): void => {
     // Pin functionality will be implemented in Phase 3
     console.log('Note pin toggled:', noteId);
-  };
+  }, []);
 
-  const handleNoteArchive = (noteId: string): void => {
+  const handleNoteArchive = useCallback((noteId: string): void => {
     // Archive functionality will be implemented in Phase 3
     console.log('Note archive toggled:', noteId);
-  };
+  }, []);
 
   return (
     <div className='flex-1 p-screen-margin space-y-4'>
@@ -439,8 +439,13 @@ Don't forget to check for sales on organic produce!`,
                 {sampleNotes.filter(n => n.isPinned && !n.isArchived).length} pinned
               </span>
               <span className='text-accent'>
-                {selectedTags.length > 0 ? `${selectedTags.length} filters active` : 'All notes'}
+                {selectedTags.length > 0 ? `${selectedTags.length} filter${selectedTags.length > 1 ? 's' : ''} active` : 'All notes'}
               </span>
+              {searchQuery && (
+                <span className='text-priority-important'>
+                  Search: "{searchQuery}"
+                </span>
+              )}
             </div>
           </div>
         </div>

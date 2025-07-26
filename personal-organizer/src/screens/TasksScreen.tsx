@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   TaskFilters,
   SwipeableTaskCard,
@@ -6,6 +6,13 @@ import {
   type TaskData,
   type TaskState,
 } from '@/components/tasks';
+import {
+  sortByPriorityScore,
+  getPriorityStats,
+  filterByPriority,
+  type Priority
+} from '@/utils/priorities';
+import { isOverdue } from '@/utils/dates';
 
 const TasksScreen: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<TaskFilterType>('all');
@@ -103,43 +110,50 @@ const TasksScreen: React.FC = () => {
     },
   ];
 
-  // Calculate task counts for filter badges
-  const taskCounts = {
-    all: sampleTasks.length,
-    urgent: sampleTasks.filter(task => task.priority === 'urgent').length,
-    important: sampleTasks.filter(task => task.priority === 'important').length,
-    optional: sampleTasks.filter(task => task.priority === 'optional').length,
-  };
+  // Calculate task counts for filter badges using utility functions
+  const taskCounts = useMemo(() => {
+    const stats = getPriorityStats(sampleTasks);
+    return {
+      all: stats.total,
+      urgent: stats.distribution.urgent,
+      important: stats.distribution.important,
+      optional: stats.distribution.optional,
+    };
+  }, [sampleTasks]);
 
-  // Filter tasks based on active filter
-  const filteredTasks = sampleTasks.filter(task => {
-    if (activeFilter === 'all') return true;
-    return task.priority === activeFilter;
-  });
+  // Filter and sort tasks based on active filter using utility functions
+  const filteredTasks = useMemo(() => {
+    let filtered = activeFilter === 'all'
+      ? sampleTasks
+      : filterByPriority(sampleTasks, activeFilter as Priority);
 
-  const handleFilterChange = (filter: TaskFilterType): void => {
+    // Sort by priority score for optimal task ordering
+    return sortByPriorityScore(filtered);
+  }, [sampleTasks, activeFilter]);
+
+  const handleFilterChange = useCallback((filter: TaskFilterType): void => {
     setActiveFilter(filter);
-  };
+  }, []);
 
-  const handleTaskStateChange = (taskId: string, newState: TaskState): void => {
+  const handleTaskStateChange = useCallback((taskId: string, newState: TaskState): void => {
     // State change functionality will be implemented in Phase 3
     console.log('Task state change:', taskId, newState);
-  };
+  }, []);
 
-  const handleSwipeComplete = (taskId: string): void => {
+  const handleSwipeComplete = useCallback((taskId: string): void => {
     // Swipe complete functionality will be implemented in Phase 3
     console.log('Swipe complete:', taskId);
-  };
+  }, []);
 
-  const handleSwipeEdit = (taskId: string): void => {
+  const handleSwipeEdit = useCallback((taskId: string): void => {
     // Swipe edit functionality will be implemented in Phase 3
     console.log('Swipe edit:', taskId);
-  };
+  }, []);
 
-  const handleTaskClick = (task: TaskData): void => {
+  const handleTaskClick = useCallback((task: TaskData): void => {
     // Task click functionality will be implemented in Phase 3
     console.log('Task clicked:', task.title);
-  };
+  }, []);
 
   return (
     <div className='flex-1 p-screen-margin space-y-4'>
@@ -211,6 +225,9 @@ const TasksScreen: React.FC = () => {
               </span>
               <span className='text-priority-urgent'>
                 {sampleTasks.filter(t => t.priority === 'urgent' && t.state !== 'completed').length} urgent
+              </span>
+              <span className='text-priority-important'>
+                {sampleTasks.filter(t => t.dueDate && isOverdue(t.dueDate) && t.state !== 'completed').length} overdue
               </span>
             </div>
           </div>
