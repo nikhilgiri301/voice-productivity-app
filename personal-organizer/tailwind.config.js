@@ -89,6 +89,11 @@ export default {
           '50%': { transform: 'scaleY(1.5)' },
         },
       },
+      zIndex: {
+        'fixed': '1000',
+        'dropdown': '1050',
+        'modal': '1100',
+      },
     },
   },
   plugins: [],
