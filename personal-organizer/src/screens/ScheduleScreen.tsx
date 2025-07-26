@@ -1,103 +1,108 @@
-import React from 'react';
-import { Card } from '@/components/common';
+import React, { useState } from 'react';
+import {
+  DayNavigation,
+  ScheduleFilters,
+  TimeBlockLayout,
+  type ScheduleFilterType,
+  type EventData,
+} from '@/components/schedule';
 
 const ScheduleScreen: React.FC = () => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [activeFilter, setActiveFilter] = useState<ScheduleFilterType>('today');
+
+  // Sample events data
+  const sampleEvents: EventData[] = [
+    {
+      id: '1',
+      title: 'Team Standup',
+      description: 'Daily sync with the development team',
+      startTime: new Date(2025, 6, 26, 9, 0), // 9:00 AM
+      endTime: new Date(2025, 6, 26, 9, 30), // 9:30 AM
+      location: 'Conference Room A',
+      context: 'work',
+      linkedItems: [
+        { id: 't1', title: 'Review sprint progress', type: 'task' },
+        { id: 't2', title: 'Update project timeline', type: 'task' },
+      ],
+    },
+    {
+      id: '2',
+      title: 'Client Presentation',
+      description: 'Present Q3 project deliverables to stakeholders',
+      startTime: new Date(2025, 6, 26, 14, 0), // 2:00 PM
+      endTime: new Date(2025, 6, 26, 15, 0), // 3:00 PM
+      location: 'Main Conference Room',
+      context: 'work',
+      linkedItems: [
+        { id: 'n1', title: 'Presentation slides', type: 'note' },
+        { id: 't3', title: 'Prepare demo environment', type: 'task' },
+        { id: 'n2', title: 'Client feedback notes', type: 'note' },
+      ],
+    },
+    {
+      id: '3',
+      title: 'Gym Session',
+      description: 'Strength training and cardio workout',
+      startTime: new Date(2025, 6, 26, 18, 0), // 6:00 PM
+      endTime: new Date(2025, 6, 26, 19, 0), // 7:00 PM
+      location: 'Fitness Center',
+      context: 'personal',
+    },
+    {
+      id: '4',
+      title: 'Coffee with Sarah',
+      description: 'Catch up and discuss weekend plans',
+      startTime: new Date(2025, 6, 26, 10, 30), // 10:30 AM
+      endTime: new Date(2025, 6, 26, 11, 30), // 11:30 AM
+      location: 'Local Coffee Shop',
+      context: 'personal',
+      linkedItems: [
+        { id: 'n3', title: 'Weekend trip ideas', type: 'note' },
+      ],
+    },
+  ];
+
+  const handleDateChange = (date: Date): void => {
+    setCurrentDate(date);
+  };
+
+  const handleFilterChange = (filter: ScheduleFilterType): void => {
+    setActiveFilter(filter);
+  };
+
+  const handleEventClick = (event: EventData): void => {
+    // Event click handler - will be implemented in Phase 3
+    console.log('Event clicked:', event.title);
+  };
+
   return (
     <div className='flex-1 p-screen-margin space-y-4'>
       {/* Screen Header */}
-      <div className='text-center'>
+      <div className='text-center mb-6'>
         <h1 className='text-section-header text-text-primary mb-2'>Schedule</h1>
         <p className='text-secondary text-text-secondary'>
           Your meetings and appointments
         </p>
       </div>
 
-      {/* Placeholder Content */}
-      <div className='space-y-4'>
-        <Card variant='glass' padding='md'>
-          <div className='text-center py-8'>
-            <div className='w-16 h-16 mx-auto mb-4 bg-context-work bg-opacity-20 rounded-full flex items-center justify-center'>
-              <svg
-                className='w-8 h-8 text-context-work'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'
-                />
-              </svg>
-            </div>
-            <h3 className='text-card-title text-text-primary mb-2'>
-              Schedule Coming Soon
-            </h3>
-            <p className='text-body text-text-secondary'>
-              Calendar integration and meeting management will be available in
-              Phase 2.
-            </p>
-          </div>
-        </Card>
+      {/* Day Navigation */}
+      <DayNavigation
+        currentDate={currentDate}
+        onDateChange={handleDateChange}
+      />
 
-        {/* Sample Schedule Items */}
-        <div className='space-y-3'>
-          <Card
-            variant='glass'
-            padding='md'
-            className='border-l-4 border-context-work'
-          >
-            <div className='flex items-center justify-between'>
-              <div>
-                <h4 className='text-card-title text-text-primary'>
-                  Team Standup
-                </h4>
-                <p className='text-secondary text-text-secondary'>
-                  9:00 AM - 9:30 AM
-                </p>
-              </div>
-              <div className='w-3 h-3 bg-context-work rounded-full'></div>
-            </div>
-          </Card>
+      {/* Schedule Filters */}
+      <ScheduleFilters
+        activeFilter={activeFilter}
+        onFilterChange={handleFilterChange}
+      />
 
-          <Card
-            variant='glass'
-            padding='md'
-            className='border-l-4 border-priority-important'
-          >
-            <div className='flex items-center justify-between'>
-              <div>
-                <h4 className='text-card-title text-text-primary'>
-                  Client Presentation
-                </h4>
-                <p className='text-secondary text-text-secondary'>
-                  2:00 PM - 3:00 PM
-                </p>
-              </div>
-              <div className='w-3 h-3 bg-priority-important rounded-full'></div>
-            </div>
-          </Card>
-
-          <Card
-            variant='glass'
-            padding='md'
-            className='border-l-4 border-context-personal'
-          >
-            <div className='flex items-center justify-between'>
-              <div>
-                <h4 className='text-card-title text-text-primary'>
-                  Gym Session
-                </h4>
-                <p className='text-secondary text-text-secondary'>
-                  6:00 PM - 7:00 PM
-                </p>
-              </div>
-              <div className='w-3 h-3 bg-context-personal rounded-full'></div>
-            </div>
-          </Card>
-        </div>
-      </div>
+      {/* Events Timeline */}
+      <TimeBlockLayout
+        events={sampleEvents}
+        onEventClick={handleEventClick}
+      />
     </div>
   );
 };
