@@ -88,6 +88,16 @@ export default {
           '0%, 100%': { transform: 'scaleY(1)' },
           '50%': { transform: 'scaleY(1.5)' },
         },
+        'recording-pulse': {
+          '0%, 100%': {
+            transform: 'scale(1)',
+            boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.7)'
+          },
+          '50%': {
+            transform: 'scale(1.05)',
+            boxShadow: '0 0 0 10px rgba(239, 68, 68, 0)'
+          },
+        },
       },
       zIndex: {
         'fixed': '1000',
