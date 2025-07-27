@@ -14,7 +14,7 @@ export interface ChipProps {
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onRemove?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   'aria-label'?: string;
-  color?: 'urgent' | 'important' | 'optional' | 'work' | 'personal' | 'accent';
+  color?: 'urgent' | 'important' | 'work' | 'personal' | 'accent';
 }
 
 const Chip: React.FC<ChipProps> = ({
@@ -51,9 +51,8 @@ const Chip: React.FC<ChipProps> = ({
 
   // Color-specific classes for priority and context variants
   const colorClasses = {
-    urgent: ['bg-priority-urgent', 'text-white'],
-    important: ['bg-priority-important', 'text-white'],
-    optional: ['bg-priority-optional', 'text-black'],
+    urgent: ['bg-red-500', 'text-white'],
+    important: ['bg-yellow-500', 'text-white'],
     work: ['bg-context-work', 'text-white'],
     personal: ['bg-context-personal', 'text-white'],
     accent: ['bg-accent', 'text-white'],

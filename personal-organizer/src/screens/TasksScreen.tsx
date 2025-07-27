@@ -46,7 +46,7 @@ const TasksScreen: React.FC = () => {
       title: 'Call dentist for appointment',
       description: 'Schedule routine cleaning and checkup appointment.',
       state: 'deferred',
-      priority: 'optional',
+      priority: 'important',
       context: 'personal',
       dueDate: new Date(2025, 6, 30), // In 4 days
       createdAt: new Date(2025, 6, 15),
@@ -80,7 +80,7 @@ const TasksScreen: React.FC = () => {
       title: 'Plan weekend trip',
       description: 'Research destinations, book accommodations, and create itinerary for the upcoming weekend getaway.',
       state: 'in-progress',
-      priority: 'optional',
+      priority: 'important',
       context: 'personal',
       dueDate: new Date(2025, 7, 1), // Next week
       createdAt: new Date(2025, 6, 18),
@@ -117,15 +117,22 @@ const TasksScreen: React.FC = () => {
       all: stats.total,
       urgent: stats.distribution.urgent,
       important: stats.distribution.important,
-      optional: stats.distribution.optional,
     };
   }, [sampleTasks]);
 
   // Filter and sort tasks based on active filter using utility functions
   const filteredTasks = useMemo(() => {
-    let filtered = activeFilter === 'all'
-      ? sampleTasks
-      : filterByPriority(sampleTasks, activeFilter as Priority);
+    let filtered: TaskData[];
+
+    if (activeFilter === 'all') {
+      filtered = sampleTasks;
+    } else if (activeFilter === 'custom') {
+      // Custom filter logic - for now, show all tasks
+      // This can be expanded later with custom filter options
+      filtered = sampleTasks;
+    } else {
+      filtered = filterByPriority(sampleTasks, activeFilter as Priority);
+    }
 
     // Sort by priority score for optimal task ordering
     return sortByPriorityScore(filtered);

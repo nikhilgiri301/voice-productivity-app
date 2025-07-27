@@ -3,16 +3,15 @@
  * Handles priority calculations, color mapping, and priority-based sorting
  */
 
-export type Priority = 'urgent' | 'important' | 'optional';
+export type Priority = 'urgent' | 'important';
 export type Context = 'work' | 'personal';
 
 /**
  * Priority levels with numeric values for sorting
  */
 export const PRIORITY_LEVELS: Record<Priority, number> = {
-  urgent: 3,
-  important: 2,
-  optional: 1,
+  urgent: 2,
+  important: 1,
 } as const;
 
 /**
@@ -20,8 +19,7 @@ export const PRIORITY_LEVELS: Record<Priority, number> = {
  */
 export const PRIORITY_COLORS: Record<Priority, string> = {
   urgent: 'rgb(239, 68, 68)', // red-500
-  important: 'rgb(245, 158, 11)', // amber-500
-  optional: 'rgb(34, 197, 94)', // green-500
+  important: 'rgb(234, 179, 8)', // yellow-500
 } as const;
 
 /**
@@ -29,8 +27,7 @@ export const PRIORITY_COLORS: Record<Priority, string> = {
  */
 export const PRIORITY_BG_COLORS: Record<Priority, string> = {
   urgent: 'rgb(254, 226, 226)', // red-100
-  important: 'rgb(254, 243, 199)', // amber-100
-  optional: 'rgb(220, 252, 231)', // green-100
+  important: 'rgb(254, 249, 195)', // yellow-100
 } as const;
 
 /**
@@ -70,7 +67,7 @@ export const getContextColor = (context: Context): string => {
 };
 
 /**
- * Sort items by priority (urgent first, then important, then optional)
+ * Sort items by priority (urgent first, then important)
  */
 export const sortByPriority = <T extends { priority: Priority }>(items: T[]): T[] => {
   return [...items].sort((a, b) => getPriorityLevel(b.priority) - getPriorityLevel(a.priority));
@@ -125,7 +122,7 @@ export const getPriorityDistribution = <T extends { priority: Priority }>(
       acc[item.priority] = (acc[item.priority] || 0) + 1;
       return acc;
     },
-    { urgent: 0, important: 0, optional: 0 } as Record<Priority, number>
+    { urgent: 0, important: 0 } as Record<Priority, number>
   );
 };
 
@@ -211,7 +208,6 @@ export const getPriorityLabel = (priority: Priority): string => {
   const labels: Record<Priority, string> = {
     urgent: 'Urgent',
     important: 'Important',
-    optional: 'Optional',
   };
   return labels[priority];
 };
@@ -234,7 +230,6 @@ export const getPriorityIcon = (priority: Priority): string => {
   const icons: Record<Priority, string> = {
     urgent: '🔥',
     important: '⚡',
-    optional: '📝',
   };
   return icons[priority];
 };
@@ -265,7 +260,7 @@ export const getRecommendedPriority = (
   context?: Context,
   baseDate: Date = new Date()
 ): Priority => {
-  if (!dueDate) return 'optional';
+  if (!dueDate) return 'important';
 
   const daysUntilDue = Math.ceil((dueDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24));
 
@@ -285,7 +280,7 @@ export const getRecommendedPriority = (
   }
 
   // Everything else
-  return 'optional';
+  return 'important';
 };
 
 /**

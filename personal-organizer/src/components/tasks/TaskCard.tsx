@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, Chip } from '@/components/common';
 
 export type TaskState = 'not-started' | 'in-progress' | 'blocked' | 'deferred' | 'cancelled' | 'completed';
-export type TaskPriority = 'urgent' | 'important' | 'optional';
+export type TaskPriority = 'urgent' | 'important';
 export type TaskContext = 'work' | 'personal';
 
 export interface TaskData {
@@ -124,11 +124,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
   };
 
   const cardClasses = [
-    'border-l-4',
-    task.context === 'work' ? 'border-l-context-work' : 'border-l-context-personal',
+    'relative',
     task.state === 'completed' ? 'opacity-75' : '',
     className,
   ].join(' ');
+
+  const accentColor = task.context === 'work' ? 'bg-context-work' : 'bg-context-personal';
 
   const titleClasses = [
     'text-card-title',
@@ -142,8 +143,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const descriptionClasses = [
     'text-body',
     'text-text-secondary',
-    'mb-3',
-    'line-clamp-2',
+    'mb-2',
+    'line-clamp-1',
     task.state === 'completed' ? 'opacity-60' : '',
   ].join(' ');
 
@@ -165,39 +166,56 @@ const TaskCard: React.FC<TaskCardProps> = ({
         'aria-label': `View task: ${task.title}` 
       })}
     >
-      <div className="flex items-start gap-3">
-        {/* State Selector */}
-        <button
-          className="touch-target flex-shrink-0 mt-0.5 transition-transform duration-200 hover:scale-110"
-          onClick={handleStateClick}
-          aria-label={`Change task state from ${getStateLabel(task.state)}`}
-        >
-          {getStateIcon(task.state)}
-        </button>
+      {/* Left Border Accent with Proper Corner Radius */}
+      <div
+        className={`absolute top-0 left-0 h-full ${accentColor} z-10`}
+        style={{
+          width: '8px',
+          borderTopLeftRadius: '12px',
+          borderBottomLeftRadius: '12px',
+          borderTopRightRadius: '12px',
+          borderBottomRightRadius: '12px'
+        }}
+      />
 
-        {/* Task Content */}
-        <div className="flex-1 min-w-0">
-          {/* Title and Priority */}
-          <div className="flex items-start justify-between mb-1">
-            <h3 className={titleClasses}>{task.title}</h3>
-            <Chip
-              variant="priority"
-              color={task.priority}
-              size="sm"
-              className="ml-2 flex-shrink-0"
-            >
-              {task.priority}
-            </Chip>
-          </div>
+      {/* Priority Chip - Aligned with accent inside edge */}
+      <div className="absolute -top-px z-20" style={{ left: '8px' }}>
+        <Chip
+          variant="priority"
+          color={task.priority}
+          size="sm"
+          className="rounded-card border-l-0 border-t-0"
+        >
+          {task.priority}
+        </Chip>
+      </div>
+
+      <div className="flex items-center">
+        {/* State Selector - Moved left by another 8px */}
+        <div className="flex justify-center items-center" style={{ width: '32px', marginLeft: '0px' }}>
+          <button
+            className="touch-target flex-shrink-0 transition-transform duration-200 hover:scale-110"
+            onClick={handleStateClick}
+            aria-label={`Change task state from ${getStateLabel(task.state)}`}
+          >
+            {getStateIcon(task.state)}
+          </button>
+        </div>
+
+        {/* Task Content - stays where it is */}
+        <div className="flex-1 min-w-0" style={{ marginLeft: '8px' }}>
+          {/* Title Only */}
+          <h3 className={titleClasses}>{task.title}</h3>
 
           {/* Description */}
           {task.description && (
             <p className={descriptionClasses}>{task.description}</p>
           )}
 
-          {/* Due Date and Context */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          {/* Due Date and Tags - Same Line */}
+          <div className="flex items-center justify-between gap-2">
+            {/* Due Date Section */}
+            <div className="flex items-center gap-2 flex-shrink-0">
               {task.dueDate && (
                 <span className={dueDateClasses}>
                   {formatDueDate(task.dueDate)}
@@ -220,36 +238,25 @@ const TaskCard: React.FC<TaskCardProps> = ({
               )}
             </div>
 
-            <Chip
-              variant="context"
-              color={task.context}
-              size="sm"
-              className="capitalize"
-            >
-              {task.context}
-            </Chip>
+            {/* Tags Section */}
+            {task.tags && task.tags.length > 0 && (
+              <div className="flex items-center gap-1 min-w-0 flex-1 justify-end">
+                {task.tags.slice(0, 2).map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2 py-1 bg-gray-100 text-micro text-gray-700 rounded-chip"
+                  >
+                    {tag}
+                  </span>
+                ))}
+                {task.tags.length > 2 && (
+                  <span className="text-micro text-text-secondary">
+                    +{task.tags.length - 2}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
-
-          {/* Tags */}
-          {task.tags && task.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
-              {task.tags.slice(0, 3).map((tag) => (
-                <Chip
-                  key={tag}
-                  variant="tag"
-                  size="sm"
-                  className="text-micro"
-                >
-                  {tag}
-                </Chip>
-              ))}
-              {task.tags.length > 3 && (
-                <Chip variant="tag" size="sm" className="text-micro">
-                  +{task.tags.length - 3} more
-                </Chip>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </Card>

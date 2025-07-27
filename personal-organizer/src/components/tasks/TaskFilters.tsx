@@ -1,7 +1,7 @@
 import React from 'react';
 import { Chip } from '@/components/common';
 
-export type TaskFilterType = 'all' | 'urgent' | 'important' | 'optional';
+export type TaskFilterType = 'all' | 'urgent' | 'important' | 'custom';
 
 export interface TaskFiltersProps {
   activeFilter: TaskFilterType;
@@ -10,7 +10,6 @@ export interface TaskFiltersProps {
     all: number;
     urgent: number;
     important: number;
-    optional: number;
   };
   className?: string;
 }
@@ -25,7 +24,7 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
     id: TaskFilterType;
     label: string;
     description: string;
-    color?: 'urgent' | 'important' | 'optional';
+    icon?: React.ReactNode;
   }> = [
     {
       id: 'all',
@@ -36,19 +35,31 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
       id: 'urgent',
       label: 'Urgent',
       description: 'Show urgent priority tasks',
-      color: 'urgent',
     },
     {
       id: 'important',
       label: 'Important',
       description: 'Show important priority tasks',
-      color: 'important',
     },
     {
-      id: 'optional',
-      label: 'Optional',
-      description: 'Show optional priority tasks',
-      color: 'optional',
+      id: 'custom',
+      label: 'Custom',
+      description: 'Custom filter options',
+      icon: (
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+          />
+        </svg>
+      ),
     },
   ];
 
@@ -65,7 +76,8 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
 
   const containerClasses = [
     'flex',
-    'gap-2',
+    'justify-between',
+    'items-center',
     'overflow-x-auto',
     'pb-2',
     'mb-4',
@@ -73,54 +85,83 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
     className,
   ].join(' ');
 
+  const getFilterButtonClasses = (filter: typeof filters[0], isActive: boolean): string => {
+    const baseClasses = [
+      'px-3',
+      'py-1',
+      'text-secondary',
+      'font-medium',
+      'rounded-chip',
+      'transition-all',
+      'duration-200',
+      'focus-ring',
+      'flex',
+      'items-center',
+      'gap-2',
+      'h-7', // Exactly halfway between h-5 (20px) and h-9 (36px) = 28px
+    ];
+
+    if (isActive) {
+      baseClasses.push('font-bold'); // Preserve bold text for active states
+      if (filter.id === 'urgent') {
+        baseClasses.push('bg-red-500', 'text-white');
+      } else if (filter.id === 'important') {
+        baseClasses.push('bg-yellow-500', 'text-white');
+      } else {
+        // All and Custom use neutral gray
+        baseClasses.push('bg-gray-500', 'text-white');
+      }
+    } else {
+      // All inactive buttons use identical styling (same as Custom)
+      baseClasses.push('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
+    }
+
+    return baseClasses.join(' ');
+  };
+
+  // Separate filters into left and right groups
+  const leftFilters = filters.filter(f => f.id !== 'custom');
+  const rightFilters = filters.filter(f => f.id === 'custom');
+
   return (
     <div className={containerClasses}>
-      {filters.map((filter) => {
-        const isActive = activeFilter === filter.id;
-        const hasCount = taskCounts && taskCounts[filter.id] > 0;
-        
-        return (
-          <div key={filter.id} className="flex-shrink-0 relative">
-            <Chip
-              variant={filter.color ? 'priority' : 'filter'}
-              {...(filter.color && { color: filter.color })}
-              size="md"
-              active={isActive}
+      {/* Left-aligned filters: All, Urgent, Important */}
+      <div className="flex gap-2">
+        {leftFilters.map((filter) => {
+          const isActive = activeFilter === filter.id;
+
+          return (
+            <button
+              key={filter.id}
+              className={getFilterButtonClasses(filter, isActive)}
               onClick={() => handleFilterClick(filter.id)}
               aria-label={filter.description}
-              className={[
-                'transition-all duration-200',
-                isActive ? 'scale-105' : 'hover:scale-102',
-                !isActive && filter.color ? 'opacity-80 hover:opacity-100' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
             >
-              {getFilterLabel(filter)}
-            </Chip>
-            
-            {/* Priority indicator dot for non-active priority filters */}
-            {!isActive && filter.color && hasCount && (
-              <div
-                className={[
-                  'absolute',
-                  '-top-1',
-                  '-right-1',
-                  'w-3',
-                  'h-3',
-                  'rounded-full',
-                  'border-2',
-                  'border-bg-primary',
-                  filter.color === 'urgent' ? 'bg-priority-urgent' : '',
-                  filter.color === 'important' ? 'bg-priority-important' : '',
-                  filter.color === 'optional' ? 'bg-priority-optional' : '',
-                ].join(' ')}
-                aria-hidden="true"
-              />
-            )}
-          </div>
-        );
-      })}
+              {filter.icon && filter.icon}
+              <span>{getFilterLabel(filter)}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Right-aligned filter: Custom */}
+      <div className="flex gap-2">
+        {rightFilters.map((filter) => {
+          const isActive = activeFilter === filter.id;
+
+          return (
+            <button
+              key={filter.id}
+              className={getFilterButtonClasses(filter, isActive)}
+              onClick={() => handleFilterClick(filter.id)}
+              aria-label={filter.description}
+            >
+              {filter.icon && filter.icon}
+              <span>{getFilterLabel(filter)}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };
