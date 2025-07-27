@@ -123,13 +123,27 @@ const TaskCard: React.FC<TaskCardProps> = ({
     onClick?.(task);
   };
 
-  const cardClasses = [
+  const handleKeyDown = (event: React.KeyboardEvent): void => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleCardClick();
+    }
+  };
+
+  // Outer card (accent color) classes - NO padding, NO margin
+  const outerCardClasses = [
     'relative',
+    task.context === 'work' ? 'bg-context-work' : 'bg-context-personal',
     task.state === 'completed' ? 'opacity-75' : '',
-    className,
   ].join(' ');
 
-  const accentColor = task.context === 'work' ? 'bg-context-work' : 'bg-context-personal';
+  // Inner card (main content) classes - solid dark background
+  const innerCardClasses = [
+    'relative',
+    'ml-2', // 8px left margin to create accent gap
+    'bg-bg-card', // Solid dark background, not translucent
+    className,
+  ].join(' ');
 
   const titleClasses = [
     'text-card-title',
@@ -157,35 +171,33 @@ const TaskCard: React.FC<TaskCardProps> = ({
   return (
     <Card
       variant="glass"
-      padding="md"
-      className={cardClasses}
-      onClick={handleCardClick}
-      hoverable={!!onClick}
-      {...(onClick && { 
-        role: 'button',
-        'aria-label': `View task: ${task.title}` 
-      })}
+      padding="none"
+      className={outerCardClasses}
     >
-      {/* Left Border Accent with Proper Corner Radius */}
-      <div
-        className={`absolute top-0 left-0 h-full ${accentColor} z-10`}
-        style={{
-          width: '8px',
-          borderTopLeftRadius: '12px',
-          borderBottomLeftRadius: '12px',
-          borderTopRightRadius: '12px',
-          borderBottomRightRadius: '12px'
-        }}
-      />
+      <Card
+        variant="glass"
+        padding="md"
+        className={innerCardClasses}
+        onClick={handleCardClick}
+        hoverable={!!onClick}
+        {...(onClick && {
+          role: 'button',
+          'aria-label': `View task: ${task.title}`,
+          tabIndex: 0,
+          onKeyDown: handleKeyDown,
+        })}
+      >
 
-      {/* Priority Chip - Aligned with accent inside edge */}
-      <div className="absolute -top-px z-20" style={{ left: '8px' }}>
-        <Chip
-          variant="priority"
-          color={task.priority}
-          size="sm"
-          className="rounded-card border-l-0 border-t-0"
-        >
+
+
+        {/* Priority Chip - Aligned with inner card edge */}
+        <div className="absolute -top-px z-20" style={{ left: '-1px' }}>
+          <Chip
+            variant="priority"
+            color={task.priority}
+            size="sm"
+            className="rounded-card"
+          >
           {task.priority}
         </Chip>
       </div>
@@ -259,6 +271,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
           </div>
         </div>
       </div>
+      </Card>
     </Card>
   );
 };
