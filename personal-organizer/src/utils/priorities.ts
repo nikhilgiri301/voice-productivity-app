@@ -3,31 +3,31 @@
  * Handles priority calculations, color mapping, and priority-based sorting
  */
 
-export type Priority = 'urgent' | 'important';
+export type Priority = 'critical' | 'useful';
 export type Context = 'work' | 'personal';
 
 /**
  * Priority levels with numeric values for sorting
  */
 export const PRIORITY_LEVELS: Record<Priority, number> = {
-  urgent: 2,
-  important: 1,
+  critical: 2,
+  useful: 1,
 } as const;
 
 /**
  * Priority color mappings for UI components
  */
 export const PRIORITY_COLORS: Record<Priority, string> = {
-  urgent: 'rgb(239, 68, 68)', // red-500
-  important: 'rgb(234, 179, 8)', // yellow-500
+  critical: 'rgb(239, 68, 68)', // red-500
+  useful: 'rgb(234, 179, 8)', // yellow-500
 } as const;
 
 /**
  * Priority background colors for UI components
  */
 export const PRIORITY_BG_COLORS: Record<Priority, string> = {
-  urgent: 'rgb(254, 226, 226)', // red-100
-  important: 'rgb(254, 249, 195)', // yellow-100
+  critical: 'rgb(254, 226, 226)', // red-100
+  useful: 'rgb(254, 249, 195)', // yellow-100
 } as const;
 
 /**
@@ -67,7 +67,7 @@ export const getContextColor = (context: Context): string => {
 };
 
 /**
- * Sort items by priority (urgent first, then important)
+ * Sort items by priority (critical first, then useful)
  */
 export const sortByPriority = <T extends { priority: Priority }>(items: T[]): T[] => {
   return [...items].sort((a, b) => getPriorityLevel(b.priority) - getPriorityLevel(a.priority));
@@ -206,8 +206,8 @@ export const sortByPriorityScore = <T extends {
  */
 export const getPriorityLabel = (priority: Priority): string => {
   const labels: Record<Priority, string> = {
-    urgent: 'Urgent',
-    important: 'Important',
+    critical: 'Critical',
+    useful: 'Useful',
   };
   return labels[priority];
 };
@@ -228,8 +228,8 @@ export const getContextLabel = (context: Context): string => {
  */
 export const getPriorityIcon = (priority: Priority): string => {
   const icons: Record<Priority, string> = {
-    urgent: '🔥',
-    important: '⚡',
+    critical: '🔥',
+    useful: '⚡',
   };
   return icons[priority];
 };
@@ -246,10 +246,10 @@ export const getContextIcon = (context: Context): string => {
 };
 
 /**
- * Determine if a priority level is high (urgent or important)
+ * Determine if a priority level is high (critical or useful)
  */
 export const isHighPriority = (priority: Priority): boolean => {
-  return priority === 'urgent' || priority === 'important';
+  return priority === 'critical' || priority === 'useful';
 };
 
 /**
@@ -260,27 +260,27 @@ export const getRecommendedPriority = (
   context?: Context,
   baseDate: Date = new Date()
 ): Priority => {
-  if (!dueDate) return 'important';
+  if (!dueDate) return 'useful';
 
   const daysUntilDue = Math.ceil((dueDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24));
 
   // Overdue or due today/tomorrow
   if (daysUntilDue <= 1) {
-    return 'urgent';
+    return 'critical';
   }
 
   // Due within a week
   if (daysUntilDue <= 7) {
-    return context === 'work' ? 'important' : 'important';
+    return context === 'work' ? 'useful' : 'useful';
   }
 
   // Due within two weeks
   if (daysUntilDue <= 14) {
-    return 'important';
+    return 'useful';
   }
 
   // Everything else
-  return 'important';
+  return 'useful';
 };
 
 /**

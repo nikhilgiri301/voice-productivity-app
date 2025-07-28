@@ -1,15 +1,15 @@
 import React from 'react';
 import { Chip } from '@/components/common';
 
-export type TaskFilterType = 'all' | 'urgent' | 'important' | 'custom';
+export type TaskFilterType = 'view' | 'all' | 'critical' | 'useful' | 'custom';
 
 export interface TaskFiltersProps {
   activeFilter: TaskFilterType;
   onFilterChange: (filter: TaskFilterType) => void;
   taskCounts?: {
     all: number;
-    urgent: number;
-    important: number;
+    critical: number;
+    useful: number;
   };
   className?: string;
 }
@@ -27,19 +27,45 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
     icon?: React.ReactNode;
   }> = [
     {
+      id: 'view',
+      label: 'View',
+      description: 'View options',
+      icon: (
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+          />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+          />
+        </svg>
+      ),
+    },
+    {
       id: 'all',
       label: 'All',
       description: 'Show all tasks',
     },
     {
-      id: 'urgent',
-      label: 'Urgent',
-      description: 'Show urgent priority tasks',
+      id: 'critical',
+      label: 'Critical',
+      description: 'Show critical priority tasks',
     },
     {
-      id: 'important',
-      label: 'Important',
-      description: 'Show important priority tasks',
+      id: 'useful',
+      label: 'Useful',
+      description: 'Show useful priority tasks',
     },
     {
       id: 'custom',
@@ -68,9 +94,9 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
   };
 
   const getFilterLabel = (filter: typeof filters[0]): string => {
-    if (!taskCounts) return filter.label;
-    
-    const count = taskCounts[filter.id];
+    if (!taskCounts || filter.id === 'view' || filter.id === 'custom') return filter.label;
+
+    const count = taskCounts[filter.id as keyof typeof taskCounts];
     return count > 0 ? `${filter.label} (${count})` : filter.label;
   };
 
@@ -103,9 +129,9 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
 
     if (isActive) {
       baseClasses.push('font-bold'); // Preserve bold text for active states
-      if (filter.id === 'urgent') {
+      if (filter.id === 'critical') {
         baseClasses.push('bg-red-500', 'text-white');
-      } else if (filter.id === 'important') {
+      } else if (filter.id === 'useful') {
         baseClasses.push('bg-yellow-500', 'text-white');
       } else {
         // All and Custom use neutral gray
@@ -125,7 +151,7 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
 
   return (
     <div className={containerClasses}>
-      {/* Left-aligned filters: All, Urgent, Important */}
+      {/* Left-aligned filters: View, All, Critical, Useful */}
       <div className="flex gap-2">
         {leftFilters.map((filter) => {
           const isActive = activeFilter === filter.id;

@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, Chip } from '@/components/common';
 
 export type TaskState = 'not-started' | 'in-progress' | 'blocked' | 'deferred' | 'cancelled' | 'completed';
-export type TaskPriority = 'urgent' | 'important';
+export type TaskPriority = 'critical' | 'useful';
 export type TaskContext = 'work' | 'personal';
 
 export interface TaskData {
@@ -203,8 +203,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
       </div>
 
       <div className="flex items-center">
-        {/* State Selector - Moved left by another 8px */}
-        <div className="flex justify-center items-center" style={{ width: '32px', marginLeft: '0px' }}>
+        {/* State Selector - Moved 8px left */}
+        <div className="flex justify-center items-center" style={{ width: '32px', marginLeft: '-8px' }}>
           <button
             className="touch-target flex-shrink-0 transition-transform duration-200 hover:scale-110"
             onClick={handleStateClick}
@@ -214,8 +214,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           </button>
         </div>
 
-        {/* Task Content - stays where it is */}
-        <div className="flex-1 min-w-0" style={{ marginLeft: '8px' }}>
+        {/* Task Content - moved 12px right total */}
+        <div className="flex-1 min-w-0" style={{ marginLeft: '12px' }}>
           {/* Title Only */}
           <h3 className={titleClasses}>{task.title}</h3>
 

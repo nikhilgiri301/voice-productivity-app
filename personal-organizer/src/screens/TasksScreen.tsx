@@ -24,18 +24,18 @@ const TasksScreen: React.FC = () => {
       title: 'Review project proposal',
       description: 'Analyze the Q3 project proposal and provide detailed feedback on technical feasibility and resource requirements.',
       state: 'not-started',
-      priority: 'urgent',
+      priority: 'critical',
       context: 'work',
       dueDate: new Date(2025, 6, 26), // Today
       createdAt: new Date(2025, 6, 24),
-      tags: ['review', 'project', 'urgent'],
+      tags: ['review', 'project', 'critical'],
     },
     {
       id: '2',
       title: 'Update portfolio website',
       description: 'Add recent projects and update the design to reflect current skills and experience.',
       state: 'in-progress',
-      priority: 'important',
+      priority: 'useful',
       context: 'personal',
       dueDate: new Date(2025, 6, 28), // In 2 days
       createdAt: new Date(2025, 6, 20),
@@ -46,7 +46,7 @@ const TasksScreen: React.FC = () => {
       title: 'Call dentist for appointment',
       description: 'Schedule routine cleaning and checkup appointment.',
       state: 'deferred',
-      priority: 'important',
+      priority: 'useful',
       context: 'personal',
       dueDate: new Date(2025, 6, 30), // In 4 days
       createdAt: new Date(2025, 6, 15),
@@ -57,7 +57,7 @@ const TasksScreen: React.FC = () => {
       title: 'Prepare presentation slides',
       description: 'Create comprehensive slides for the client presentation including project timeline, deliverables, and budget breakdown.',
       state: 'completed',
-      priority: 'urgent',
+      priority: 'critical',
       context: 'work',
       dueDate: new Date(2025, 6, 25), // Yesterday
       createdAt: new Date(2025, 6, 22),
@@ -69,18 +69,18 @@ const TasksScreen: React.FC = () => {
       title: 'Fix authentication bug',
       description: 'Investigate and resolve the login timeout issue reported by multiple users.',
       state: 'blocked',
-      priority: 'urgent',
+      priority: 'critical',
       context: 'work',
       dueDate: new Date(2025, 6, 27), // Tomorrow
       createdAt: new Date(2025, 6, 23),
-      tags: ['bug', 'authentication', 'urgent'],
+      tags: ['bug', 'authentication', 'critical'],
     },
     {
       id: '6',
       title: 'Plan weekend trip',
       description: 'Research destinations, book accommodations, and create itinerary for the upcoming weekend getaway.',
       state: 'in-progress',
-      priority: 'important',
+      priority: 'useful',
       context: 'personal',
       dueDate: new Date(2025, 7, 1), // Next week
       createdAt: new Date(2025, 6, 18),
@@ -91,7 +91,7 @@ const TasksScreen: React.FC = () => {
       title: 'Code review for team member',
       description: 'Review pull request #247 for the new user dashboard feature.',
       state: 'cancelled',
-      priority: 'important',
+      priority: 'useful',
       context: 'work',
       dueDate: new Date(2025, 6, 24), // Yesterday
       createdAt: new Date(2025, 6, 21),
@@ -102,7 +102,7 @@ const TasksScreen: React.FC = () => {
       title: 'Grocery shopping',
       description: 'Buy ingredients for meal prep and household essentials.',
       state: 'not-started',
-      priority: 'important',
+      priority: 'useful',
       context: 'personal',
       dueDate: new Date(2025, 6, 27), // Tomorrow
       createdAt: new Date(2025, 6, 26),
@@ -115,8 +115,8 @@ const TasksScreen: React.FC = () => {
     const stats = getPriorityStats(sampleTasks);
     return {
       all: stats.total,
-      urgent: stats.distribution.urgent,
-      important: stats.distribution.important,
+      critical: stats.distribution.critical,
+      useful: stats.distribution.useful,
     };
   }, [sampleTasks]);
 
@@ -125,6 +125,10 @@ const TasksScreen: React.FC = () => {
     let filtered: TaskData[];
 
     if (activeFilter === 'all') {
+      filtered = sampleTasks;
+    } else if (activeFilter === 'view') {
+      // View filter logic - for now, show all tasks
+      // This can be expanded later with view options
       filtered = sampleTasks;
     } else if (activeFilter === 'custom') {
       // Custom filter logic - for now, show all tasks
@@ -231,7 +235,7 @@ const TasksScreen: React.FC = () => {
                 {sampleTasks.filter(t => t.state === 'completed').length} completed
               </span>
               <span className='text-priority-urgent'>
-                {sampleTasks.filter(t => t.priority === 'urgent' && t.state !== 'completed').length} urgent
+                {sampleTasks.filter(t => t.priority === 'critical' && t.state !== 'completed').length} critical
               </span>
               <span className='text-priority-important'>
                 {sampleTasks.filter(t => t.dueDate && isOverdue(t.dueDate) && t.state !== 'completed').length} overdue
