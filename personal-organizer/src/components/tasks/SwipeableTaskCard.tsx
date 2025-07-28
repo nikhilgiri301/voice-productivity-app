@@ -196,7 +196,7 @@ const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
     'transition-all',
     'duration-200',
     side === 'left' ? 'right-0' : 'left-0',
-    side === 'left' ? 'bg-accent' : 'bg-priority-important',
+    side === 'left' ? 'bg-accent' : 'bg-priority-urgent',
     show ? 'opacity-100 scale-100' : 'opacity-0 scale-95',
   ].join(' ');
 

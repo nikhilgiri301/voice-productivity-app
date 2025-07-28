@@ -8,9 +8,8 @@ description: "Example description"
 **See `voice-first-productivity-final-app-design-system.md` for all UI decisions**
 
 ## Quick Color Reference (ONE meaning per color)
-- `#ff6363` → Urgent priority ONLY
-- `#ff9800` → Important priority ONLY  
-- `#ffc107` → Optional priority ONLY
+- `#ff6363` → Critical priority ONLY (also used for urgent/blocked states)
+- `#ffc107` → Useful priority ONLY
 - `#4a90e2` → Work context borders ONLY
 - `#4caf50` → Personal context borders ONLY
 - `#e91e63` → UI accent/interactions ONLY

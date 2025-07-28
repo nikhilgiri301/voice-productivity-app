@@ -237,7 +237,7 @@ const TasksScreen: React.FC = () => {
               <span className='text-priority-urgent'>
                 {sampleTasks.filter(t => t.priority === 'critical' && t.state !== 'completed').length} critical
               </span>
-              <span className='text-priority-important'>
+              <span className='text-priority-urgent'>
                 {sampleTasks.filter(t => t.dueDate && isOverdue(t.dueDate) && t.state !== 'completed').length} overdue
               </span>
             </div>

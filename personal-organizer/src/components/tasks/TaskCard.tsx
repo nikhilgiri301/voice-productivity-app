@@ -53,7 +53,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         );
       case 'deferred':
         return (
-          <div className="w-5 h-5 bg-priority-optional rounded flex items-center justify-center">
+          <div className="w-5 h-5 bg-priority-useful rounded flex items-center justify-center">
             <svg className="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
             </svg>
@@ -149,7 +149,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     'text-card-title',
     'text-text-primary',
     'font-semibold',
-    'mb-1',
+    'mb-0.5',
     'line-clamp-2',
     task.state === 'completed' ? 'line-through opacity-60' : '',
   ].join(' ');
@@ -157,7 +157,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const descriptionClasses = [
     'text-body',
     'text-text-secondary',
-    'mb-2',
+    'mb-1',
     'line-clamp-1',
     task.state === 'completed' ? 'opacity-60' : '',
   ].join(' ');
@@ -176,7 +176,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     >
       <Card
         variant="glass"
-        padding="md"
+        padding="sm"
         className={innerCardClasses}
         onClick={handleCardClick}
         hoverable={!!onClick}
@@ -189,18 +189,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
       >
 
 
-
-        {/* Priority Chip - Aligned with inner card edge */}
-        <div className="absolute -top-px z-20" style={{ left: '-1px' }}>
-          <Chip
-            variant="priority"
-            color={task.priority}
-            size="sm"
-            className="rounded-card"
-          >
-          {task.priority}
-        </Chip>
-      </div>
 
       <div className="flex items-center">
         {/* State Selector - Moved 8px left */}
@@ -216,8 +204,18 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
         {/* Task Content - moved 12px right total */}
         <div className="flex-1 min-w-0" style={{ marginLeft: '12px' }}>
-          {/* Title Only */}
-          <h3 className={titleClasses}>{task.title}</h3>
+          {/* Title and Priority Chip - Same Line */}
+          <div className="flex items-center justify-between gap-2">
+            <h3 className={titleClasses}>{task.title}</h3>
+            <Chip
+              variant="priority"
+              color={task.priority}
+              size="sm"
+              className="rounded-card flex-shrink-0"
+            >
+              {task.priority}
+            </Chip>
+          </div>
 
           {/* Description */}
           {task.description && (

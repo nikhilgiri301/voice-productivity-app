@@ -59,7 +59,7 @@ const VoiceMicButton: React.FC<VoiceMicButtonProps> = ({
         'ring-opacity-30',
       ],
       processing: [
-        'bg-priority-important',
+        'bg-priority-useful',
         'text-white',
         'shadow-lg',
       ],
@@ -204,7 +204,7 @@ const VoiceMicButton: React.FC<VoiceMicButtonProps> = ({
               'h-2',
               'rounded-full',
               state === 'listening' ? 'bg-priority-urgent animate-pulse' : '',
-              state === 'processing' ? 'bg-priority-important animate-spin' : '',
+              state === 'processing' ? 'bg-priority-useful animate-spin' : '',
               state === 'error' ? 'bg-priority-urgent animate-bounce' : '',
             ].join(' ')}
           />

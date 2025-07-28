@@ -87,7 +87,7 @@ const ProcessingState: React.FC<ProcessingStateProps> = ({
     'rounded-full',
     'border-4',
     'border-transparent',
-    'border-t-priority-important',
+    'border-t-priority-useful',
     'transition-transform',
     'duration-100',
   ].join(' ');
