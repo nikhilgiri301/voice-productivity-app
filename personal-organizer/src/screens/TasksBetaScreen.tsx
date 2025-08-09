@@ -8,6 +8,9 @@ interface Task {
   priority: 'critical' | 'important' | 'neither';
   context: 'work' | 'personal';
   dueDate?: Date;
+  parentId?: string;        // null for parent tasks, set for subtasks
+  subtasks?: Task[];        // only populated for parent tasks
+  isExpanded?: boolean;     // UI state for expansion
 }
 
 // Sample data
@@ -19,6 +22,7 @@ const sampleTasks: Task[] = [
     priority: 'critical',
     context: 'work',
     dueDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+    isExpanded: false,
   },
   {
     id: '2',
@@ -27,6 +31,7 @@ const sampleTasks: Task[] = [
     priority: 'important',
     context: 'work',
     dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    isExpanded: false,
   },
   {
     id: '3',
@@ -35,6 +40,7 @@ const sampleTasks: Task[] = [
     priority: 'critical',
     context: 'work',
     dueDate: new Date(),
+    isExpanded: false,
   },
   {
     id: '4',
@@ -43,6 +49,36 @@ const sampleTasks: Task[] = [
     priority: 'critical',
     context: 'work',
     dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+    isExpanded: false,
+    subtasks: [
+      {
+        id: '4a',
+        title: 'Review security requirements',
+        state: 'completed',
+        priority: 'critical', // inherited from parent
+        context: 'work',
+        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+        parentId: '4',
+      },
+      {
+        id: '4b',
+        title: 'Update JWT validation logic',
+        state: 'in-progress',
+        priority: 'critical', // inherited from parent
+        context: 'work',
+        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+        parentId: '4',
+      },
+      {
+        id: '4c',
+        title: 'Write unit tests',
+        state: 'not-started',
+        priority: 'important', // changed from inherited critical
+        context: 'work',
+        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+        parentId: '4',
+      },
+    ],
   },
   {
     id: '5',
@@ -51,6 +87,7 @@ const sampleTasks: Task[] = [
     priority: 'neither',
     context: 'personal',
     dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+    isExpanded: false,
   },
   {
     id: '6',
@@ -59,6 +96,36 @@ const sampleTasks: Task[] = [
     priority: 'important',
     context: 'personal',
     dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+    isExpanded: false,
+    subtasks: [
+      {
+        id: '6a',
+        title: 'Add new project screenshots',
+        state: 'completed',
+        priority: 'important', // inherited
+        context: 'personal',
+        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+        parentId: '6',
+      },
+      {
+        id: '6b',
+        title: 'Update resume section',
+        state: 'completed',
+        priority: 'important', // inherited
+        context: 'personal',
+        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+        parentId: '6',
+      },
+      {
+        id: '6c',
+        title: 'Write blog post about recent work',
+        state: 'not-started',
+        priority: 'neither', // changed from inherited important
+        context: 'personal',
+        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+        parentId: '6',
+      },
+    ],
   },
   {
     id: '7',
@@ -67,6 +134,7 @@ const sampleTasks: Task[] = [
     priority: 'important',
     context: 'personal',
     dueDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000),
+    isExpanded: false,
   },
   {
     id: '8',
@@ -75,8 +143,29 @@ const sampleTasks: Task[] = [
     priority: 'important',
     context: 'personal',
     dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    isExpanded: false,
   },
 ];
+
+// Helper functions for subtask logic
+const getSubtaskProgress = (task: Task): { completed: number; total: number } => {
+  if (!task.subtasks) return { completed: 0, total: 0 };
+  const completed = task.subtasks.filter(subtask => subtask.state === 'completed').length;
+  return { completed, total: task.subtasks.length };
+};
+
+const shouldAutoCompleteParent = (task: Task): boolean => {
+  if (!task.subtasks || task.subtasks.length === 0) return false;
+  return task.subtasks.every(subtask => subtask.state === 'completed');
+};
+
+const isParentTask = (task: Task): boolean => {
+  return !task.parentId && (task.subtasks && task.subtasks.length > 0);
+};
+
+const isSubtask = (task: Task): boolean => {
+  return !!task.parentId;
+};
 
 // Priority Slider Component
 const PrioritySlider: React.FC<{
@@ -180,8 +269,20 @@ const PrioritySlider: React.FC<{
 };
 
 // Single Task Card Component
-const TaskCard: React.FC<{ task: Task }> = ({ task }) => {
+const TaskCard: React.FC<{
+  task: Task;
+  onToggleExpansion?: (taskId: string) => void;
+  onPriorityChange?: (taskId: string, priority: 'critical' | 'important' | 'neither') => void;
+  isSubtask?: boolean;
+}> = ({ task, onToggleExpansion, onPriorityChange, isSubtask = false }) => {
   const [priority, setPriority] = React.useState(task.priority);
+
+  // Handle priority change
+  const handlePriorityChange = (newPriority: 'critical' | 'important' | 'neither') => {
+    setPriority(newPriority);
+    onPriorityChange?.(task.id, newPriority);
+  };
+
   // Get state icon
   const getStateIcon = () => {
     switch (task.state) {
@@ -197,7 +298,7 @@ const TaskCard: React.FC<{ task: Task }> = ({ task }) => {
         );
       case 'completed':
         return (
-          <div className="w-5 h-5 bg-accent rounded flex items-center justify-center">
+          <div className="w-5 h-5 bg-green-500 rounded flex items-center justify-center">
             <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>
@@ -205,19 +306,19 @@ const TaskCard: React.FC<{ task: Task }> = ({ task }) => {
         );
       case 'blocked':
         return (
-          <div className="w-5 h-5 bg-priority-urgent rounded flex items-center justify-center">
-            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM10 18a8 8 0 100-16 8 8 0 000 16z" clipRule="evenodd" />
-            </svg>
+          <div className="w-5 h-5 bg-red-500 rounded flex items-center justify-center">
+            <div className="w-2 h-2 bg-white rounded-full" />
           </div>
         );
       case 'deferred':
         return (
-          <div className="w-5 h-5 bg-priority-useful rounded flex items-center justify-center">
-            <svg className="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-            </svg>
+          <div className="w-5 h-5 bg-yellow-500 rounded flex items-center justify-center">
+            <div className="w-1 h-3 bg-white rounded-full" />
           </div>
+        );
+      default:
+        return (
+          <div className="w-5 h-5 border-2 border-text-secondary rounded" />
         );
     }
   };
@@ -225,63 +326,124 @@ const TaskCard: React.FC<{ task: Task }> = ({ task }) => {
   // Get accent color - matching the header context buttons (from Tailwind config)
   const accentColor = task.context === 'work' ? '#0050ff' : '#4cca4f';
 
+  // Get subtask progress for parent tasks
+  const progress = isParentTask(task) ? getSubtaskProgress(task) : null;
+
+  // Determine if this task can be expanded
+  const canExpand = isParentTask(task);
+
   // Card styles with grid layout
   const cardStyle: React.CSSProperties = {
-    height: '48px',
+    height: isSubtask ? '36px' : '48px', // Subtasks are smaller
     display: 'grid',
     gridTemplateColumns: '56px 1fr 100px',
     alignItems: 'center',
-    backgroundColor: '#2a2a3e',
-    borderLeft: `12px solid ${accentColor}`,
+    backgroundColor: isSubtask ? '#242438' : '#2a2a3e', // Subtasks slightly darker
+    borderLeft: `${isSubtask ? '8px' : '12px'} solid ${accentColor}`, // Thinner border for subtasks
     borderTop: `2px solid ${accentColor}`,
     borderRight: `2px solid ${accentColor}`,
     borderBottom: `2px solid ${accentColor}`,
     borderRadius: '16px',
     marginBottom: '12px',
+    marginLeft: isSubtask ? '24px' : '0px', // Indent subtasks
+    opacity: isSubtask ? 0.9 : 1, // Slightly transparent subtasks
+    cursor: canExpand ? 'pointer' : 'default',
+  };
+
+  const handleCardClick = () => {
+    if (canExpand && onToggleExpansion) {
+      onToggleExpansion(task.id);
+    }
   };
 
   return (
-    <div style={cardStyle}>
-      {/* Status Column - Fixed 56px */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        height: '100%',
-      }}>
-        {getStateIcon()}
-      </div>
-
-      {/* Title Column - Flexible, truncated */}
-      <div style={{
-        paddingRight: '12px',
-        overflow: 'hidden',
-      }}>
-        <h3 style={{
-          fontSize: '16px',
-          fontWeight: 600,
-          color: '#ffffff',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
+    <>
+      <div style={cardStyle} onClick={handleCardClick}>
+        {/* Status Column - Fixed 56px */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
         }}>
-          {task.title}
-        </h3>
+          {canExpand ? (
+            // Expansion indicator for parent tasks
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{
+                fontSize: '12px',
+                color: '#ffffff',
+                transform: task.isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                transition: 'transform 0.2s ease',
+              }}>
+                ▶
+              </span>
+              {getStateIcon()}
+            </div>
+          ) : (
+            getStateIcon()
+          )}
+        </div>
+
+        {/* Title Column - Flexible, truncated */}
+        <div style={{
+          paddingRight: '12px',
+          overflow: 'hidden',
+        }}>
+          <h3 style={{
+            fontSize: isSubtask ? '14px' : '16px', // Smaller font for subtasks
+            fontWeight: isSubtask ? 500 : 600, // Less bold for subtasks
+            color: '#ffffff',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}>
+            {task.title}
+          </h3>
+        </div>
+
+        {/* Priority/Progress Column - Fixed 100px */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingRight: '12px',
+        }}>
+          {progress ? (
+            // Show progress for parent tasks with subtasks
+            <div style={{
+              fontSize: '12px',
+              color: '#ffffff',
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              padding: '2px 8px',
+              borderRadius: '12px',
+              fontWeight: 600,
+            }}>
+              [{progress.completed}/{progress.total}]
+            </div>
+          ) : (
+            // Show priority slider for tasks without subtasks or subtasks themselves
+            <PrioritySlider
+              priority={priority}
+              onChange={handlePriorityChange}
+            />
+          )}
+        </div>
       </div>
 
-      {/* Priority Column - Fixed 100px */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingRight: '12px',
-      }}>
-        <PrioritySlider 
-          priority={priority}
-          onChange={setPriority}
-        />
-      </div>
-    </div>
+      {/* Render subtasks if expanded */}
+      {canExpand && task.isExpanded && task.subtasks && (
+        <>
+          {task.subtasks.map(subtask => (
+            <TaskCard
+              key={subtask.id}
+              task={subtask}
+              onPriorityChange={onPriorityChange}
+              isSubtask={true}
+            />
+          ))}
+        </>
+      )}
+    </>
   );
 };
 
@@ -291,10 +453,22 @@ const TasksBetaFilters: React.FC<{
   onFilterChange: (filterId: string) => void;
   tasks: Task[];
 }> = ({ activeFilter, onFilterChange, tasks }) => {
-  // Count tasks by priority
-  const allCount = tasks.length;
-  const criticalCount = tasks.filter(task => task.priority === 'critical').length;
-  const importantCount = tasks.filter(task => task.priority === 'important').length;
+  // Count tasks by priority (including subtasks)
+  const getAllTasksFlat = (taskList: Task[]): Task[] => {
+    const flat: Task[] = [];
+    taskList.forEach(task => {
+      flat.push(task);
+      if (task.subtasks) {
+        flat.push(...task.subtasks);
+      }
+    });
+    return flat;
+  };
+
+  const allTasksFlat = getAllTasksFlat(tasks);
+  const allCount = allTasksFlat.length;
+  const criticalCount = allTasksFlat.filter(task => task.priority === 'critical').length;
+  const importantCount = allTasksFlat.filter(task => task.priority === 'important').length;
 
   const leftFilters = [
     {
@@ -419,17 +593,57 @@ const TasksBetaFilters: React.FC<{
 // Main Screen Component
 const TasksBetaScreen: React.FC = () => {
   const [activeFilter, setActiveFilter] = React.useState('all');
+  const [tasks, setTasks] = React.useState<Task[]>(sampleTasks);
 
-  // Filter tasks based on active filter
-  const getFilteredTasks = (tasks: Task[]) => {
+  // Handle task expansion toggle
+  const handleToggleExpansion = (taskId: string) => {
+    setTasks(prevTasks =>
+      prevTasks.map(task =>
+        task.id === taskId
+          ? { ...task, isExpanded: !task.isExpanded }
+          : task
+      )
+    );
+  };
+
+  // Handle priority changes
+  const handlePriorityChange = (taskId: string, newPriority: 'critical' | 'important' | 'neither') => {
+    setTasks(prevTasks =>
+      prevTasks.map(task => {
+        // Update main task
+        if (task.id === taskId) {
+          return { ...task, priority: newPriority };
+        }
+        // Update subtask
+        if (task.subtasks) {
+          const updatedSubtasks = task.subtasks.map(subtask =>
+            subtask.id === taskId
+              ? { ...subtask, priority: newPriority }
+              : subtask
+          );
+          return { ...task, subtasks: updatedSubtasks };
+        }
+        return task;
+      })
+    );
+  };
+
+  // Filter tasks based on active filter (includes subtask matching)
+  const getFilteredTasks = (taskList: Task[]) => {
     switch (activeFilter) {
       case 'critical':
-        return tasks.filter(task => task.priority === 'critical');
+        return taskList.filter(task =>
+          task.priority === 'critical' ||
+          (task.subtasks && task.subtasks.some(subtask => subtask.priority === 'critical'))
+        );
       case 'important':
-        return tasks.filter(task => task.priority === 'important');
+        return taskList.filter(task =>
+          task.priority === 'important' ||
+          (task.subtasks && task.subtasks.some(subtask => subtask.priority === 'important'))
+        );
       case 'all':
       default:
-        return tasks;
+        return taskList;
     }
   };
 
@@ -439,25 +653,25 @@ const TasksBetaScreen: React.FC = () => {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const allOverdue = sampleTasks.filter(task => {
+  const allOverdue = tasks.filter(task => {
     if (!task.dueDate) return false;
     const taskDate = new Date(task.dueDate.getFullYear(), task.dueDate.getMonth(), task.dueDate.getDate());
     return taskDate < today;
   });
 
-  const allDueToday = sampleTasks.filter(task => {
+  const allDueToday = tasks.filter(task => {
     if (!task.dueDate) return false;
     const taskDate = new Date(task.dueDate.getFullYear(), task.dueDate.getMonth(), task.dueDate.getDate());
     return taskDate.getTime() === today.getTime();
   });
 
-  const allDueTomorrow = sampleTasks.filter(task => {
+  const allDueTomorrow = tasks.filter(task => {
     if (!task.dueDate) return false;
     const taskDate = new Date(task.dueDate.getFullYear(), task.dueDate.getMonth(), task.dueDate.getDate());
     return taskDate.getTime() === tomorrow.getTime();
   });
 
-  const allUpcoming = sampleTasks.filter(task => {
+  const allUpcoming = tasks.filter(task => {
     if (!task.dueDate) return false;
     const taskDate = new Date(task.dueDate.getFullYear(), task.dueDate.getMonth(), task.dueDate.getDate());
     return taskDate > tomorrow;
@@ -483,7 +697,7 @@ const TasksBetaScreen: React.FC = () => {
       <TasksBetaFilters
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
-        tasks={sampleTasks}
+        tasks={tasks}
       />
 
       {/* Task Sections */}
@@ -492,7 +706,14 @@ const TasksBetaScreen: React.FC = () => {
           <h2 className='text-base text-text-primary font-semibold mb-3'>
             Overdue ({overdue.length})
           </h2>
-          {overdue.map(task => <TaskCard key={task.id} task={task} />)}
+          {overdue.map(task => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onToggleExpansion={handleToggleExpansion}
+              onPriorityChange={handlePriorityChange}
+            />
+          ))}
         </div>
       )}
 
@@ -501,7 +722,14 @@ const TasksBetaScreen: React.FC = () => {
           <h2 className='text-base text-text-primary font-semibold mb-3'>
             Due Today ({dueToday.length})
           </h2>
-          {dueToday.map(task => <TaskCard key={task.id} task={task} />)}
+          {dueToday.map(task => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onToggleExpansion={handleToggleExpansion}
+              onPriorityChange={handlePriorityChange}
+            />
+          ))}
         </div>
       )}
 
@@ -510,7 +738,14 @@ const TasksBetaScreen: React.FC = () => {
           <h2 className='text-base text-text-primary font-semibold mb-3'>
             Due Tomorrow ({dueTomorrow.length})
           </h2>
-          {dueTomorrow.map(task => <TaskCard key={task.id} task={task} />)}
+          {dueTomorrow.map(task => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onToggleExpansion={handleToggleExpansion}
+              onPriorityChange={handlePriorityChange}
+            />
+          ))}
         </div>
       )}
 
@@ -519,7 +754,14 @@ const TasksBetaScreen: React.FC = () => {
           <h2 className='text-base text-text-primary font-semibold mb-3'>
             Upcoming ({upcoming.length})
           </h2>
-          {upcoming.map(task => <TaskCard key={task.id} task={task} />)}
+          {upcoming.map(task => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onToggleExpansion={handleToggleExpansion}
+              onPriorityChange={handlePriorityChange}
+            />
+          ))}
         </div>
       )}
     </div>
