@@ -41,8 +41,8 @@ export default {
         'priority-urgent': '#ff6363', // legacy compatibility
 
         // Context Colors (from constants)
-        'context-work': '#4a90e2',
-        'context-personal': '#4caf50',
+        'context-work': '#0050ff', // Blue Option 8
+        'context-personal': '#4cca4f', // Green Option D
 
         // Task State Colors (from constants)
         'state-not-started': '#6b7280',

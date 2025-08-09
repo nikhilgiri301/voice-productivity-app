@@ -18,6 +18,7 @@ const TasksScreen: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<TaskFilterType>('all');
 
   // Sample tasks data with various states, priorities, and due dates
+  // All tasks now have due dates for better organization
   const sampleTasks: TaskData[] = [
     {
       id: '1',
@@ -26,8 +27,8 @@ const TasksScreen: React.FC = () => {
       state: 'not-started',
       priority: 'critical',
       context: 'work',
-      dueDate: new Date(2025, 6, 26), // Today
-      createdAt: new Date(2025, 6, 24),
+      dueDate: new Date(), // Today
+      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
       tags: ['review', 'project', 'critical'],
     },
     {
@@ -37,8 +38,8 @@ const TasksScreen: React.FC = () => {
       state: 'in-progress',
       priority: 'useful',
       context: 'personal',
-      dueDate: new Date(2025, 6, 28), // In 2 days
-      createdAt: new Date(2025, 6, 20),
+      dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // In 2 days
+      createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
       tags: ['portfolio', 'design', 'development'],
     },
     {
@@ -48,8 +49,8 @@ const TasksScreen: React.FC = () => {
       state: 'deferred',
       priority: 'useful',
       context: 'personal',
-      dueDate: new Date(2025, 6, 30), // In 4 days
-      createdAt: new Date(2025, 6, 15),
+      dueDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // In 4 days
+      createdAt: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000),
       tags: ['health', 'appointment'],
     },
     {
@@ -59,9 +60,9 @@ const TasksScreen: React.FC = () => {
       state: 'completed',
       priority: 'critical',
       context: 'work',
-      dueDate: new Date(2025, 6, 25), // Yesterday
-      createdAt: new Date(2025, 6, 22),
-      completedAt: new Date(2025, 6, 25),
+      dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // Yesterday
+      createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+      completedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
       tags: ['presentation', 'client', 'slides'],
     },
     {
@@ -71,8 +72,8 @@ const TasksScreen: React.FC = () => {
       state: 'blocked',
       priority: 'critical',
       context: 'work',
-      dueDate: new Date(2025, 6, 27), // Tomorrow
-      createdAt: new Date(2025, 6, 23),
+      dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // Tomorrow
+      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       tags: ['bug', 'authentication', 'critical'],
     },
     {
@@ -82,20 +83,20 @@ const TasksScreen: React.FC = () => {
       state: 'in-progress',
       priority: 'useful',
       context: 'personal',
-      dueDate: new Date(2025, 7, 1), // Next week
-      createdAt: new Date(2025, 6, 18),
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Next week
+      createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
       tags: ['travel', 'planning', 'weekend'],
     },
     {
       id: '7',
-      title: 'Code review for team member',
-      description: 'Review pull request #247 for the new user dashboard feature.',
-      state: 'cancelled',
+      title: 'Submit expense report',
+      description: 'Compile and submit monthly expense report with receipts.',
+      state: 'not-started',
       priority: 'useful',
       context: 'work',
-      dueDate: new Date(2025, 6, 24), // Yesterday
-      createdAt: new Date(2025, 6, 21),
-      tags: ['code-review', 'team', 'dashboard'],
+      dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days overdue
+      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+      tags: ['expenses', 'admin', 'monthly'],
     },
     {
       id: '8',
@@ -104,9 +105,20 @@ const TasksScreen: React.FC = () => {
       state: 'not-started',
       priority: 'useful',
       context: 'personal',
-      dueDate: new Date(2025, 6, 27), // Tomorrow
-      createdAt: new Date(2025, 6, 26),
+      dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // Tomorrow
+      createdAt: new Date(),
       tags: ['shopping', 'meal-prep'],
+    },
+    {
+      id: '9',
+      title: 'Team standup meeting',
+      description: 'Weekly team sync to discuss progress and blockers.',
+      state: 'not-started',
+      priority: 'critical',
+      context: 'work',
+      dueDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days overdue
+      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      tags: ['meeting', 'team', 'standup'],
     },
   ];
 
@@ -120,8 +132,8 @@ const TasksScreen: React.FC = () => {
     };
   }, [sampleTasks]);
 
-  // Filter and sort tasks based on active filter using utility functions
-  const filteredTasks = useMemo(() => {
+  // Filter and organize tasks by due date sections
+  const organizedTasks = useMemo(() => {
     let filtered: TaskData[];
 
     if (activeFilter === 'all') {
@@ -138,8 +150,54 @@ const TasksScreen: React.FC = () => {
       filtered = filterByPriority(sampleTasks, activeFilter as Priority);
     }
 
-    // Sort by priority score for optimal task ordering
-    return sortByPriorityScore(filtered);
+    // Exclude completed tasks for now (we'll handle them separately later)
+    const activeTasks = filtered.filter(task => task.state !== 'completed');
+
+    // Group tasks by due date sections
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const overdue: TaskData[] = [];
+    const dueToday: TaskData[] = [];
+    const dueTomorrow: TaskData[] = [];
+    const upcoming: TaskData[] = [];
+
+    activeTasks.forEach(task => {
+      if (!task.dueDate) return; // Skip tasks without due dates for now
+
+      const taskDate = new Date(task.dueDate.getFullYear(), task.dueDate.getMonth(), task.dueDate.getDate());
+
+      if (taskDate < today) {
+        overdue.push(task);
+      } else if (taskDate.getTime() === today.getTime()) {
+        dueToday.push(task);
+      } else if (taskDate.getTime() === tomorrow.getTime()) {
+        dueTomorrow.push(task);
+      } else {
+        upcoming.push(task);
+      }
+    });
+
+    // Sort each section
+    // Overdue: most overdue first (earliest dates first)
+    overdue.sort((a, b) => (a.dueDate?.getTime() || 0) - (b.dueDate?.getTime() || 0));
+
+    // Due today and tomorrow: sort by priority score
+    dueToday.sort((a, b) => sortByPriorityScore([a, b]).indexOf(a) - sortByPriorityScore([a, b]).indexOf(b));
+    dueTomorrow.sort((a, b) => sortByPriorityScore([a, b]).indexOf(a) - sortByPriorityScore([a, b]).indexOf(b));
+
+    // Upcoming: chronological order (earliest first)
+    upcoming.sort((a, b) => (a.dueDate?.getTime() || 0) - (b.dueDate?.getTime() || 0));
+
+    return {
+      overdue,
+      dueToday,
+      dueTomorrow,
+      upcoming,
+      completed: filtered.filter(task => task.state === 'completed')
+    };
   }, [sampleTasks, activeFilter]);
 
   const handleFilterChange = useCallback((filter: TaskFilterType): void => {
@@ -183,9 +241,13 @@ const TasksScreen: React.FC = () => {
         taskCounts={taskCounts}
       />
 
-      {/* Tasks List */}
-      <div className='space-y-3'>
-        {filteredTasks.length === 0 ? (
+      {/* Organized Tasks List */}
+      <div className='space-y-6'>
+        {/* Check if we have any active tasks */}
+        {organizedTasks.overdue.length === 0 &&
+         organizedTasks.dueToday.length === 0 &&
+         organizedTasks.dueTomorrow.length === 0 &&
+         organizedTasks.upcoming.length === 0 ? (
           <div className='text-center py-12'>
             <div className='w-16 h-16 mx-auto mb-4 bg-accent bg-opacity-20 rounded-full flex items-center justify-center'>
               <svg
@@ -210,35 +272,105 @@ const TasksScreen: React.FC = () => {
             </p>
           </div>
         ) : (
-          filteredTasks.map((task) => (
-            <SwipeableTaskCard
-              key={task.id}
-              task={task}
-              onStateChange={handleTaskStateChange}
-              onSwipeComplete={handleSwipeComplete}
-              onSwipeEdit={handleSwipeEdit}
-              onClick={handleTaskClick}
-            />
-          ))
+          <>
+            {/* Overdue Section */}
+            {organizedTasks.overdue.length > 0 && (
+              <div className='space-y-3'>
+                <h2 className='text-base text-text-primary font-semibold'>
+                  Overdue ({organizedTasks.overdue.length})
+                </h2>
+                {organizedTasks.overdue.map((task) => (
+                  <SwipeableTaskCard
+                    key={task.id}
+                    task={task}
+                    onStateChange={handleTaskStateChange}
+                    onSwipeComplete={handleSwipeComplete}
+                    onSwipeEdit={handleSwipeEdit}
+                    onClick={handleTaskClick}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Due Today Section */}
+            {organizedTasks.dueToday.length > 0 && (
+              <div className='space-y-3'>
+                <h2 className='text-base text-text-primary font-semibold'>
+                  Due Today ({organizedTasks.dueToday.length})
+                </h2>
+                {organizedTasks.dueToday.map((task) => (
+                  <SwipeableTaskCard
+                    key={task.id}
+                    task={task}
+                    onStateChange={handleTaskStateChange}
+                    onSwipeComplete={handleSwipeComplete}
+                    onSwipeEdit={handleSwipeEdit}
+                    onClick={handleTaskClick}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Due Tomorrow Section */}
+            {organizedTasks.dueTomorrow.length > 0 && (
+              <div className='space-y-3'>
+                <h2 className='text-base text-text-primary font-semibold'>
+                  Due Tomorrow ({organizedTasks.dueTomorrow.length})
+                </h2>
+                {organizedTasks.dueTomorrow.map((task) => (
+                  <SwipeableTaskCard
+                    key={task.id}
+                    task={task}
+                    onStateChange={handleTaskStateChange}
+                    onSwipeComplete={handleSwipeComplete}
+                    onSwipeEdit={handleSwipeEdit}
+                    onClick={handleTaskClick}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Upcoming Section */}
+            {organizedTasks.upcoming.length > 0 && (
+              <div className='space-y-3'>
+                <h2 className='text-base text-text-primary font-semibold'>
+                  Upcoming ({organizedTasks.upcoming.length})
+                </h2>
+                {organizedTasks.upcoming.map((task) => (
+                  <SwipeableTaskCard
+                    key={task.id}
+                    task={task}
+                    onStateChange={handleTaskStateChange}
+                    onSwipeComplete={handleSwipeComplete}
+                    onSwipeEdit={handleSwipeEdit}
+                    onClick={handleTaskClick}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 
       {/* Task Summary */}
-      {filteredTasks.length > 0 && (
+      {(organizedTasks.overdue.length > 0 ||
+        organizedTasks.dueToday.length > 0 ||
+        organizedTasks.dueTomorrow.length > 0 ||
+        organizedTasks.upcoming.length > 0) && (
         <div className='mt-6 p-4 bg-bg-card rounded-card'>
           <div className='flex items-center justify-between text-secondary'>
             <span className='text-text-secondary'>
-              Showing {filteredTasks.length} of {sampleTasks.length} tasks
+              Showing {organizedTasks.overdue.length + organizedTasks.dueToday.length + organizedTasks.dueTomorrow.length + organizedTasks.upcoming.length} active tasks
             </span>
             <div className='flex items-center gap-4'>
               <span className='text-text-secondary'>
-                {sampleTasks.filter(t => t.state === 'completed').length} completed
+                {organizedTasks.completed.length} completed
               </span>
               <span className='text-priority-urgent'>
                 {sampleTasks.filter(t => t.priority === 'critical' && t.state !== 'completed').length} critical
               </span>
               <span className='text-priority-urgent'>
-                {sampleTasks.filter(t => t.dueDate && isOverdue(t.dueDate) && t.state !== 'completed').length} overdue
+                {organizedTasks.overdue.length} overdue
               </span>
             </div>
           </div>
