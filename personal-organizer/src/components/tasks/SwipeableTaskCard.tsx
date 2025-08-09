@@ -180,9 +180,7 @@ const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
 
   const cardClasses = [
     'relative',
-    'transition-transform',
-    'duration-200',
-    isDragging ? 'transition-none' : '',
+    // Removed transition classes to test if they're causing width calculation issues
   ].join(' ');
 
   const actionClasses = (side: 'left' | 'right', show: boolean) => [
@@ -244,9 +242,7 @@ const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
       <div
         ref={cardRef}
         className={cardClasses}
-        style={{
-          transform: `translateX(${swipeOffset}px)`,
-        }}
+        // Removed transform to test if it's causing width calculation issues
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

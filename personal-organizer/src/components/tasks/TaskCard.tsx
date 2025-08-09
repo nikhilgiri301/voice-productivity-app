@@ -137,13 +137,20 @@ const TaskCard: React.FC<TaskCardProps> = ({
     task.state === 'completed' ? 'opacity-75' : '',
   ].join(' ');
 
-  // Inner card (main content) classes - solid dark background
+  // Inner card (main content) classes - solid dark background, fixed width with 1px right border
   const innerCardClasses = [
-    'relative',
+    'relative', // This will be our positioning reference for the state button
     'ml-2', // 8px left margin to create accent gap
     'bg-bg-card', // Solid dark background, not translucent
     className,
   ].join(' ');
+
+  // Custom style for precise 1px right margin to match top/bottom border effect
+  const innerCardStyle = {
+    width: 'calc(100% - 9px)', // 8px left margin + 1px right margin
+  };
+
+
 
   const titleClasses = [
     'text-base', // 16px
@@ -170,108 +177,116 @@ const TaskCard: React.FC<TaskCardProps> = ({
   ].join(' ');
 
   return (
-    <Card
-      variant="glass"
-      padding="none"
-      className={outerCardClasses}
+    <div
+      className={`relative bg-bg-card w-full ${task.state === 'completed' ? 'opacity-75' : ''} ${className}`}
+      onClick={handleCardClick}
+      {...(onClick && {
+        role: 'button',
+        'aria-label': `View task: ${task.title}`,
+        tabIndex: 0,
+        onKeyDown: handleKeyDown,
+      })}
     >
-      <Card
-        variant="glass"
-        padding="sm"
-        className={innerCardClasses}
-        onClick={handleCardClick}
-        hoverable={!!onClick}
-        {...(onClick && {
-          role: 'button',
-          'aria-label': `View task: ${task.title}`,
-          tabIndex: 0,
-          onKeyDown: handleKeyDown,
-        })}
-      >
-
-
-
-      <div className="flex items-center">
-        {/* State Selector - Moved 8px left */}
-        <div className="flex justify-center items-center" style={{ width: '32px', marginLeft: '-8px' }}>
-          <button
-            className="touch-target flex-shrink-0 transition-transform duration-200 hover:scale-110"
-            onClick={handleStateClick}
-            aria-label={`Change task state from ${getStateLabel(task.state)}`}
-          >
-            {getStateIcon(task.state)}
-          </button>
-        </div>
-
-        {/* Task Content - moved 12px right total */}
-        <div className="flex-1 min-w-0" style={{ marginLeft: '12px' }}>
-          {/* Title and Priority Chip - Same Line */}
-          <div className="flex items-center justify-between gap-2">
-            <h3 className={titleClasses}>{task.title}</h3>
-            <Chip
-              variant="priority"
-              color={task.priority}
-              size="sm"
-              className="rounded-card flex-shrink-0"
+      {/* Debug: Blue line at card start */}
+      <div className="absolute top-0 bottom-0 w-1 bg-blue-500" style={{ left: '0px', zIndex: 200 }}></div>
+      
+      {/* Accent bar - absolute positioned */}
+      <div 
+        className={`absolute left-0 top-0 bottom-0 w-2 ${task.context === 'work' ? 'bg-context-work' : 'bg-context-personal'}`}
+      />
+      
+      {/* Content container */}
+      <div style={{ position: 'relative', padding: '12px' }}>
+        {/* Fixed width spacer for state button */}
+        <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+          <div style={{ width: '48px', flexShrink: 0, display: 'flex', justifyContent: 'center' }}>
+            <button
+              className="touch-target"
+              onClick={handleStateClick}
+              aria-label={`Change task state from ${getStateLabel(task.state)}`}
             >
-              {task.priority === 'useful' ? 'Important' : task.priority.charAt(0).toUpperCase() + task.priority.slice(1).toLowerCase()}
-            </Chip>
+              {getStateIcon(task.state)}
+            </button>
           </div>
-
-          {/* Description */}
-          {task.description && (
-            <p className={descriptionClasses}>{task.description}</p>
-          )}
-
-          {/* Due Date and Tags - Same Line */}
-          <div className="flex items-center justify-between gap-2">
-            {/* Due Date Section */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {task.dueDate && (
-                <span className={dueDateClasses}>
-                  {formatDueDate(task.dueDate)}
-                </span>
-              )}
-              {task.dueDate && isOverdue(task.dueDate) && (
-                <svg
-                  className="w-4 h-4 text-priority-urgent"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+          
+          {/* Debug: Red line at content start */}
+          <div style={{ position: 'absolute', left: '60px', top: 0, bottom: 0, width: '2px', backgroundColor: 'red' }}></div>
+          
+          {/* Content Area */}
+          <div style={{ flex: 1, marginLeft: '8px' }}>
+            {/* Row 1: Title and Priority Chip */}
+            <div className="flex items-start gap-3">
+              <h3 className={`${titleClasses} flex-1 min-w-0`}>{task.title}</h3>
+              <div className="flex-shrink-0">
+                <Chip
+                  variant="priority"
+                  color={task.priority}
+                  size="sm"
+                  className="rounded-card"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-                  />
-                </svg>
-              )}
+                  {task.priority === 'useful' ? 'Important' : task.priority.charAt(0).toUpperCase() + task.priority.slice(1).toLowerCase()}
+                </Chip>
+              </div>
             </div>
 
-            {/* Tags Section */}
-            {task.tags && task.tags.length > 0 && (
-              <div className="flex items-center gap-1 min-w-0 flex-1 justify-end">
-                {task.tags.slice(0, 2).map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2 py-1 bg-gray-100 text-micro text-gray-700 rounded-chip font-normal"
-                  >
-                    {tag.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
-                  </span>
-                ))}
-                {task.tags.length > 2 && (
-                  <span className="text-micro text-text-secondary">
-                    +{task.tags.length - 2}
-                  </span>
+            {/* Row 2: Description */}
+            <div className="h-4 overflow-hidden">
+              <p className={descriptionClasses} style={{ lineHeight: '16px' }}>
+                {task.description || '\u00A0'}
+              </p>
+            </div>
+
+            {/* Row 3: Due Date and Tags */}
+            <div className="flex items-center justify-between gap-2">
+              {/* Due Date Section - Left aligned */}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {task.dueDate && (
+                  <>
+                    <span className={dueDateClasses}>
+                      {formatDueDate(task.dueDate)}
+                    </span>
+                    {isOverdue(task.dueDate) && (
+                      <svg
+                        className="w-4 h-4 text-priority-urgent"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                        />
+                      </svg>
+                    )}
+                  </>
                 )}
               </div>
-            )}
+
+              {/* Tags Section - Right aligned */}
+              {task.tags && task.tags.length > 0 && (
+                <div className="flex items-center gap-1 justify-end">
+                  {task.tags.slice(0, 2).map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-0.5 bg-gray-100 text-micro text-gray-700 rounded-chip font-normal whitespace-nowrap"
+                    >
+                      {tag.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
+                    </span>
+                  ))}
+                  {task.tags.length > 2 && (
+                    <span className="text-micro text-text-secondary">
+                      +{task.tags.length - 2}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-      </Card>
-    </Card>
+    </div>
   );
 };
 

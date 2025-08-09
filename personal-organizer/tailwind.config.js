@@ -96,6 +96,8 @@ export default {
         '2.5': '0.625rem', // 10px
         '3.5': '0.875rem', // 14px
         '11': '2.75rem',   // 44px - touch target
+        '14': '3.5rem',    // 56px - pl-14 padding
+        'card-padding': '1rem', // 16px - p-card-padding
       },
 
       // Border radius system - matches src/constants/design-tokens.ts
