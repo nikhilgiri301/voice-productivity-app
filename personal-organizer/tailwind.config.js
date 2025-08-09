@@ -85,6 +85,8 @@ export default {
         medium: '500',
         semibold: '600',
         bold: '700',
+        extrabold: '800',
+        black: '1000',
       },
 
       // Spacing system - matches src/constants/design-tokens.ts (4px base unit)

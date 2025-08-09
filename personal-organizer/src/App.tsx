@@ -8,7 +8,7 @@ import {
   useNavigate,
 } from 'react-router-dom';
 import { Layout, type TabId, type ContextMode } from '@/components/common';
-import { ScheduleScreen, TasksScreen, NotesScreen } from '@/screens';
+import { ScheduleScreen, TasksScreen, NotesScreen, TasksBetaScreen } from '@/screens';
 
 // App content component that has access to router hooks
 const AppContent: React.FC = () => {
@@ -18,6 +18,7 @@ const AppContent: React.FC = () => {
 
   // Determine active tab based on current route
   const getActiveTabFromPath = (pathname: string): TabId => {
+    if (pathname.startsWith('/tasks-beta')) return 'tasks-beta';
     if (pathname.startsWith('/tasks')) return 'tasks';
     if (pathname.startsWith('/notes')) return 'notes';
     return 'schedule';
@@ -26,7 +27,9 @@ const AppContent: React.FC = () => {
   const activeTab = getActiveTabFromPath(location.pathname);
 
   const handleTabChange = useCallback((tabId: TabId): void => {
-    navigate(`/${tabId}`);
+    // Map 'tasks-beta' to its route explicitly (others map 1:1)
+    const path = tabId === 'tasks-beta' ? '/tasks-beta' : `/${tabId}`;
+    navigate(path);
   }, [navigate]);
 
   const handleContextChange = useCallback((context: ContextMode): void => {
@@ -45,6 +48,9 @@ const AppContent: React.FC = () => {
         <Route path='/' element={<Navigate to='/schedule' replace />} />
         <Route path='/schedule' element={<ScheduleScreen />} />
         <Route path='/tasks' element={<TasksScreen />} />
+        {import.meta.env.VITE_ENABLE_TASKS_BETA === 'true' && (
+          <Route path='/tasks-beta' element={<TasksBetaScreen />} />
+        )}
         <Route path='/notes' element={<NotesScreen />} />
         <Route path='*' element={<Navigate to='/schedule' replace />} />
       </Routes>

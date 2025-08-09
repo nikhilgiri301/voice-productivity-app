@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type TabId = 'schedule' | 'tasks' | 'notes';
+export type TabId = 'schedule' | 'tasks' | 'notes' | 'tasks-beta';
 
 export interface Tab {
   id: TabId;
@@ -20,6 +20,8 @@ const TabBar: React.FC<TabBarProps> = ({
   onTabChange,
   className = '',
 }) => {
+  const enableBeta = import.meta.env.VITE_ENABLE_TASKS_BETA === 'true';
+
   const tabs: Tab[] = [
     {
       id: 'schedule',
@@ -60,6 +62,29 @@ const TabBar: React.FC<TabBarProps> = ({
       ),
       badge: 3, // Example badge count
     },
+    ...(enableBeta
+      ? [
+          {
+            id: 'tasks-beta' as const,
+            label: 'Tasks (Beta)',
+            icon: (
+              <svg
+                className='w-6 h-6'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M12 6v6l4 2m6-4a10 10 0 11-20 0 10 10 0 0120 0z'
+                />
+              </svg>
+            ),
+          } as Tab,
+        ]
+      : []),
     {
       id: 'notes',
       label: 'Notes',

@@ -64,8 +64,8 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
     },
     {
       id: 'useful',
-      label: 'Useful',
-      description: 'Show useful priority tasks',
+      label: 'Important',
+      description: 'Show important priority tasks',
     },
     {
       id: 'custom',
@@ -94,7 +94,10 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
   };
 
   const getFilterLabel = (filter: typeof filters[0]): string => {
-    if (!taskCounts || filter.id === 'view' || filter.id === 'custom') return filter.label;
+    if (!taskCounts || filter.id === 'view' || filter.id === 'custom') {
+      // For custom filter, return empty string to show only icon
+      return filter.id === 'custom' ? '' : filter.label;
+    }
 
     const count = taskCounts[filter.id as keyof typeof taskCounts];
     return count > 0 ? `${filter.label} (${count})` : filter.label;
@@ -164,7 +167,7 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
               aria-label={filter.description}
             >
               {filter.icon && filter.icon}
-              <span>{getFilterLabel(filter)}</span>
+              {getFilterLabel(filter) && <span>{getFilterLabel(filter)}</span>}
             </button>
           );
         })}
@@ -183,7 +186,7 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
               aria-label={filter.description}
             >
               {filter.icon && filter.icon}
-              <span>{getFilterLabel(filter)}</span>
+              {getFilterLabel(filter) && <span>{getFilterLabel(filter)}</span>}
             </button>
           );
         })}

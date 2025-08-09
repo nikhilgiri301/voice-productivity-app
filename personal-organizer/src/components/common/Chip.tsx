@@ -35,7 +35,6 @@ const Chip: React.FC<ChipProps> = ({
     'inline-flex',
     'items-center',
     'justify-center',
-    'font-medium',
     'rounded-chip',
     'transition-all',
     'duration-200',
@@ -45,8 +44,8 @@ const Chip: React.FC<ChipProps> = ({
   ];
 
   const sizeClasses = {
-    sm: ['px-2', 'py-1', 'text-micro', 'gap-1'],
-    md: ['px-3', 'py-2', 'text-secondary', 'gap-2'],
+    sm: ['px-2', 'py-1', 'text-micro', 'gap-1', 'font-normal'], // 10px, 400 weight
+    md: ['px-3', 'py-2', 'text-secondary', 'gap-2', 'font-normal'], // 400 weight
   };
 
   // Color-specific classes for priority and context variants

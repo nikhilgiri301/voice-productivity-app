@@ -146,25 +146,26 @@ const TaskCard: React.FC<TaskCardProps> = ({
   ].join(' ');
 
   const titleClasses = [
-    'text-card-title',
+    'text-base', // 16px
     'text-text-primary',
-    'font-semibold',
+    'font-semibold', // 600 weight
     'mb-0.5',
     'line-clamp-2',
     task.state === 'completed' ? 'line-through opacity-60' : '',
   ].join(' ');
 
   const descriptionClasses = [
-    'text-body',
+    'text-xs', // 12px
     'text-text-secondary',
+    'font-normal', // 400 weight
     'mb-1',
     'line-clamp-1',
     task.state === 'completed' ? 'opacity-60' : '',
   ].join(' ');
 
   const dueDateClasses = [
-    'text-secondary',
-    'font-medium',
+    'text-xs', // 12px
+    'font-normal', // 400 weight
     task.dueDate && isOverdue(task.dueDate) ? 'text-priority-urgent' : 'text-text-secondary',
   ].join(' ');
 
@@ -213,7 +214,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
               size="sm"
               className="rounded-card flex-shrink-0"
             >
-              {task.priority}
+              {task.priority === 'useful' ? 'Important' : task.priority.charAt(0).toUpperCase() + task.priority.slice(1).toLowerCase()}
             </Chip>
           </div>
 
@@ -254,9 +255,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 {task.tags.slice(0, 2).map((tag) => (
                   <span
                     key={tag}
-                    className="px-2 py-1 bg-gray-100 text-micro text-gray-700 rounded-chip"
+                    className="px-2 py-1 bg-gray-100 text-micro text-gray-700 rounded-chip font-normal"
                   >
-                    {tag}
+                    {tag.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
                   </span>
                 ))}
                 {task.tags.length > 2 && (
