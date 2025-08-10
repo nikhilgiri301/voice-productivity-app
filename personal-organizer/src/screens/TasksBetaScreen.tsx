@@ -18,7 +18,7 @@ const sampleTasks: Task[] = [
   {
     id: '1',
     title: 'Team standup meeting',
-    state: 'not-started',
+    state: 'completed',
     priority: 'critical',
     context: 'work',
     dueDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
@@ -27,7 +27,7 @@ const sampleTasks: Task[] = [
   {
     id: '2',
     title: 'Submit expense report',
-    state: 'not-started',
+    state: 'discarded',
     priority: 'important',
     context: 'work',
     dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
@@ -292,44 +292,70 @@ const TaskCard: React.FC<{
     onPriorityChange?.(task.id, newPriority);
   };
 
-  // Get state icon - 5-state system using only existing colors
+  // Get state icon - Engagement-based visual system
   const getStateIcon = () => {
     switch (task.state) {
       case 'not-started':
-        // Blank: Empty square with border (existing colors)
+        // Blank: Empty square with border - NOT ENGAGED (dark background)
         return (
           <div className="w-5 h-5 border-2 border-text-secondary rounded" />
         );
       case 'in-progress':
-        // In Progress: Dark background + horizontal line in border color
+        // In Progress: ENGAGED (light background + dark triangle)
         return (
-          <div className="w-5 h-5 border-2 border-text-secondary rounded flex items-center justify-center">
-            <div className="w-3 h-0.5 bg-text-secondary rounded-full" />
+          <div className="w-5 h-5 border-2 border-text-secondary bg-text-secondary rounded flex items-center justify-center">
+            <div
+              className="w-0 h-0 ml-0.5"
+              style={{
+                borderLeft: `7px solid ${isSubtask ? '#242438' : '#2a2a3e'}`, // dark background color
+                borderTop: '5px solid transparent',
+                borderBottom: '5px solid transparent',
+              }}
+            />
           </div>
         );
       case 'completed':
-        // Completed: Dark background + tick mark in border color
+        // Completed: ENGAGED (light background + dark tick mark)
         return (
-          <div className="w-5 h-5 border-2 border-text-secondary rounded flex items-center justify-center">
-            <svg className="w-3 h-3 text-text-secondary" fill="currentColor" viewBox="0 0 20 20">
+          <div className="w-5 h-5 border-2 border-text-secondary bg-text-secondary rounded flex items-center justify-center">
+            <svg
+              className="w-3.5 h-3.5"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              style={{ color: isSubtask ? '#242438' : '#2a2a3e' }}
+            >
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>
           </div>
         );
       case 'deferred':
-        // Deferred: INVERTED - light background + dark vertical line
+        // Deferred: ENGAGED (light background + dark parallel lines)
         return (
-          <div className="w-5 h-5 border-2 border-text-secondary bg-text-secondary rounded flex items-center justify-center">
-            <div className="w-0.5 h-3 bg-surface-primary rounded-full" />
+          <div className="w-5 h-5 border-2 border-text-secondary bg-text-secondary rounded flex items-center justify-center gap-0.5">
+            <div
+              className="w-0.5 h-3 rounded-full"
+              style={{ backgroundColor: isSubtask ? '#242438' : '#2a2a3e' }}
+            />
+            <div
+              className="w-0.5 h-3 rounded-full"
+              style={{ backgroundColor: isSubtask ? '#242438' : '#2a2a3e' }}
+            />
           </div>
         );
       case 'discarded':
-        // Discarded: INVERTED - light background + dark X mark
+        // Discarded: NOT ENGAGED (dark background + light X mark)
         return (
-          <div className="w-5 h-5 border-2 border-text-secondary bg-text-secondary rounded flex items-center justify-center">
-            <svg className="w-3 h-3 text-surface-primary" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
+          <div className="w-5 h-5 border-2 border-text-secondary rounded flex items-center justify-center relative">
+            {/* Diagonal line 1 (top-left to bottom-right) */}
+            <div
+              className="absolute w-3 h-0.5 bg-text-secondary rounded-full"
+              style={{ transform: 'rotate(45deg)' }}
+            />
+            {/* Diagonal line 2 (top-right to bottom-left) */}
+            <div
+              className="absolute w-3 h-0.5 bg-text-secondary rounded-full"
+              style={{ transform: 'rotate(-45deg)' }}
+            />
           </div>
         );
       default:
