@@ -40,9 +40,9 @@ export default {
         'priority-useful': '#ffc107',
         'priority-urgent': '#ff6363', // legacy compatibility
 
-        // Context Colors (from constants)
-        'context-work': '#0050ff', // Blue Option 8
-        'context-personal': '#4cca4f', // Green Option D
+        // Context Colors (updated to match TasksBeta)
+        'context-work': '#2563eb', // Balanced blue (matches TasksBeta)
+        'context-personal': '#52c41a', // Muted green (matches TasksBeta)
 
         // Task State Colors (from constants)
         'state-not-started': '#6b7280',
