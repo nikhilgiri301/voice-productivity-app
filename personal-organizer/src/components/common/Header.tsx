@@ -60,31 +60,14 @@ const Header: React.FC<HeaderProps> = ({
     onContextChange?.(context);
   };
 
-  // Context Slider Component
-  const ContextSlider: React.FC = () => {
-    const getSliderPosition = () => {
-      switch (currentContext) {
-        case 'work': return '0%';
-        case 'both': return '50%';
-        case 'personal': return '100%';
-        default: return '0%';
-      }
-    };
-
-    const getSliderColor = () => {
-      switch (currentContext) {
-        case 'work': return '#2563eb'; // Work blue
-        case 'personal': return '#52c41a'; // Personal green
-        case 'both': return '#6b7280'; // Neutral gray
-        default: return '#2563eb';
-      }
-    };
-
-    const handleSliderClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  // 3-Stage Toggle Switch
+  const ThreeStageToggle: React.FC = () => {
+    const handleToggleClick = (e: React.MouseEvent<HTMLDivElement>) => {
       const rect = e.currentTarget.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const percentage = x / rect.width;
 
+      // Three zones: left (0-33%), middle (33-67%), right (67-100%)
       if (percentage < 0.33) {
         handleContextToggle('work');
       } else if (percentage > 0.67) {
@@ -94,27 +77,100 @@ const Header: React.FC<HeaderProps> = ({
       }
     };
 
-    return (
-      <div className="flex items-center gap-3">
-        <span className="text-micro text-text-secondary">Work</span>
-        <div
-          className="relative w-16 h-6 bg-bg-card rounded-full cursor-pointer transition-all duration-200"
-          onClick={handleSliderClick}
-        >
-          {/* Slider Track */}
-          <div className="absolute inset-0 rounded-full border border-border-default" />
+    const getHandlePosition = () => {
+      switch (currentContext) {
+        case 'work': return '4px';
+        case 'both': return 'calc(50% - 12px)'; // Center the 24px handle
+        case 'personal': return 'calc(100% - 28px)'; // Right side with margin
+        default: return '4px';
+      }
+    };
 
-          {/* Slider Handle */}
+    const getHandleColor = () => {
+      switch (currentContext) {
+        case 'work': return '#2563eb';
+        case 'both': return '#6b7280';
+        case 'personal': return '#52c41a';
+        default: return '#6b7280';
+      }
+    };
+
+    const getTrackColor = () => {
+      switch (currentContext) {
+        case 'work': return 'rgba(37, 99, 235, 0.2)';
+        case 'both': return 'rgba(107, 114, 128, 0.2)';
+        case 'personal': return 'rgba(82, 196, 26, 0.2)';
+        default: return 'rgba(107, 114, 128, 0.2)';
+      }
+    };
+
+    const handleLabelClick = (context: 'work' | 'personal') => {
+      if (currentContext === context) {
+        // If already selected, go to center (both)
+        handleContextToggle('both');
+      } else {
+        // If not selected, select this context
+        handleContextToggle(context);
+      }
+    };
+
+    const getLabelStyle = (context: 'work' | 'personal') => {
+      const isSelected = currentContext === context;
+      return {
+        fontSize: '16px', // Same as task card titles
+        fontWeight: isSelected ? '600' : '400', // Bold when selected, normal when not
+        color: '#ffffff', // White text like task titles
+        transition: 'font-weight 0.2s ease',
+      };
+    };
+
+    const buttonStyle = {
+      width: '60px', // Equal width for both buttons
+      height: '32px', // Same height as toggle
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'transparent', // Invisible button
+      border: 'none', // No border
+      cursor: 'pointer',
+      padding: '0',
+    };
+
+    return (
+      <div className="flex items-center justify-center">
+        <button
+          style={buttonStyle}
+          onClick={() => handleLabelClick('work')}
+        >
+          <span style={getLabelStyle('work')}>Work</span>
+        </button>
+
+        <div className="relative mx-3">
           <div
-            className="absolute top-0.5 w-5 h-5 rounded-full transition-all duration-200 shadow-sm"
+            className="w-20 h-8 rounded-full cursor-pointer transition-all duration-200 border-2"
             style={{
-              left: `calc(${getSliderPosition()} - 10px)`,
-              backgroundColor: getSliderColor(),
-              transform: currentContext === 'both' ? 'translateX(-50%)' : 'translateX(0)'
+              backgroundColor: getTrackColor(),
+              borderColor: '#6b7280'
             }}
-          />
+            onClick={handleToggleClick}
+          >
+            {/* Toggle Handle */}
+            <div
+              className="absolute top-1 w-6 h-6 rounded-full transition-all duration-300 shadow-sm"
+              style={{
+                left: getHandlePosition(),
+                backgroundColor: getHandleColor(),
+              }}
+            />
+          </div>
         </div>
-        <span className="text-micro text-text-secondary">Personal</span>
+
+        <button
+          style={buttonStyle}
+          onClick={() => handleLabelClick('personal')}
+        >
+          <span style={getLabelStyle('personal')}>Personal</span>
+        </button>
       </div>
     );
   };
@@ -186,34 +242,9 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Context Slider */}
-        <div className='flex items-center justify-between'>
-          <ContextSlider />
-
-          {/* Voice Input Placeholder */}
-          <IconButton
-            variant='primary'
-            size='md'
-            aria-label='Voice input'
-            onClick={() => {
-              // Voice input functionality will be added in Phase 5
-              console.log('Voice input clicked');
-            }}
-          >
-            <svg
-              className='w-5 h-5'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth={2}
-                d='M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z'
-              />
-            </svg>
-          </IconButton>
+        {/* Context 3-Stage Toggle */}
+        <div className='flex items-center justify-center'>
+          <ThreeStageToggle />
         </div>
       </div>
     </header>

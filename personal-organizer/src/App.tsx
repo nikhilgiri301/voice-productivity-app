@@ -20,6 +20,7 @@ const AppContent: React.FC = () => {
   const getActiveTabFromPath = (pathname: string): TabId => {
     if (pathname.startsWith('/tasks-beta')) return 'tasks-beta';
     if (pathname.startsWith('/tasks')) return 'tasks';
+    if (pathname.startsWith('/voice')) return 'voice';
     if (pathname.startsWith('/notes')) return 'notes';
     return 'schedule';
   };
@@ -48,6 +49,7 @@ const AppContent: React.FC = () => {
         <Route path='/' element={<Navigate to='/schedule' replace />} />
         <Route path='/schedule' element={<ScheduleScreen />} />
         <Route path='/tasks' element={<TasksScreen />} />
+        <Route path='/voice' element={<div className="flex items-center justify-center h-full text-text-secondary">Voice functionality coming soon...</div>} />
         {import.meta.env.VITE_ENABLE_TASKS_BETA === 'true' && (
           <Route path='/tasks-beta' element={<TasksBetaScreen />} />
         )}

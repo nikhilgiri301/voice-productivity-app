@@ -511,25 +511,6 @@ const TasksBetaFilters: React.FC<{
 
   const leftFilters = [
     {
-      id: 'view',
-      label: 'View',
-      icon: (
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 6h16M4 10h16M4 14h16M4 18h16"
-          />
-        </svg>
-      ),
-    },
-    {
       id: 'all',
       label: `All (${allCount})`,
     },
@@ -598,7 +579,7 @@ const TasksBetaFilters: React.FC<{
   };
 
   return (
-    <div className="flex justify-between items-center gap-2 mb-6">
+    <div className="flex justify-between items-center gap-2 mb-6 mt-10">
       {/* Left-aligned filters */}
       <div className="flex gap-2">
         {leftFilters.map((filter) => (
@@ -724,14 +705,6 @@ const TasksBetaScreen: React.FC = () => {
 
   return (
     <div className='flex-1 p-screen-margin'>
-      {/* Header */}
-      <div className='text-center mb-6'>
-        <h1 className='text-section-header text-text-primary mb-2'>Tasks Beta</h1>
-        <p className='text-secondary text-text-secondary'>
-          Clean architecture with perfect alignment
-        </p>
-      </div>
-
       {/* Filters */}
       <TasksBetaFilters
         activeFilter={activeFilter}
