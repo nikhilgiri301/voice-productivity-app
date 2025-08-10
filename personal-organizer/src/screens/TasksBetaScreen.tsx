@@ -4,7 +4,7 @@ import React from 'react';
 interface Task {
   id: string;
   title: string;
-  state: 'not-started' | 'in-progress' | 'completed' | 'blocked' | 'deferred';
+  state: 'not-started' | 'in-progress' | 'completed' | 'deferred' | 'discarded';
   priority: 'critical' | 'important' | 'neither';
   context: 'work' | 'personal';
   dueDate?: Date;
@@ -45,7 +45,7 @@ const sampleTasks: Task[] = [
   {
     id: '4',
     title: 'Fix authentication bug',
-    state: 'blocked',
+    state: 'in-progress',
     priority: 'critical',
     context: 'work',
     dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
@@ -143,6 +143,15 @@ const sampleTasks: Task[] = [
     priority: 'important',
     context: 'personal',
     dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    isExpanded: false,
+  },
+  {
+    id: '9',
+    title: 'Learn advanced React patterns',
+    state: 'discarded',
+    priority: 'neither',
+    context: 'personal',
+    dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
     isExpanded: false,
   },
 ];
@@ -283,48 +292,56 @@ const TaskCard: React.FC<{
     onPriorityChange?.(task.id, newPriority);
   };
 
-  // Get state icon
+  // Get state icon - 5-state system using only existing colors
   const getStateIcon = () => {
     switch (task.state) {
       case 'not-started':
+        // Blank: Empty square with border (existing colors)
         return (
           <div className="w-5 h-5 border-2 border-text-secondary rounded" />
         );
       case 'in-progress':
+        // In Progress: Dark background + horizontal line in border color
         return (
-          <div className="w-5 h-5 border-2 border-accent rounded flex items-center justify-center">
-            <div className="w-2 h-2 bg-accent rounded-full" />
+          <div className="w-5 h-5 border-2 border-text-secondary rounded flex items-center justify-center">
+            <div className="w-3 h-0.5 bg-text-secondary rounded-full" />
           </div>
         );
       case 'completed':
+        // Completed: Dark background + tick mark in border color
         return (
-          <div className="w-5 h-5 bg-green-500 rounded flex items-center justify-center">
-            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <div className="w-5 h-5 border-2 border-text-secondary rounded flex items-center justify-center">
+            <svg className="w-3 h-3 text-text-secondary" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>
           </div>
         );
-      case 'blocked':
+      case 'deferred':
+        // Deferred: INVERTED - light background + dark vertical line
         return (
-          <div className="w-5 h-5 bg-red-500 rounded flex items-center justify-center">
-            <div className="w-2 h-2 bg-white rounded-full" />
+          <div className="w-5 h-5 border-2 border-text-secondary bg-text-secondary rounded flex items-center justify-center">
+            <div className="w-0.5 h-3 bg-surface-primary rounded-full" />
           </div>
         );
-      case 'deferred':
+      case 'discarded':
+        // Discarded: INVERTED - light background + dark X mark
         return (
-          <div className="w-5 h-5 bg-yellow-500 rounded flex items-center justify-center">
-            <div className="w-1 h-3 bg-white rounded-full" />
+          <div className="w-5 h-5 border-2 border-text-secondary bg-text-secondary rounded flex items-center justify-center">
+            <svg className="w-3 h-3 text-surface-primary" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
           </div>
         );
       default:
+        // Default to blank state
         return (
           <div className="w-5 h-5 border-2 border-text-secondary rounded" />
         );
     }
   };
 
-  // Get accent color - matching the header context buttons (from Tailwind config)
-  const accentColor = task.context === 'work' ? '#0050ff' : '#4cca4f';
+  // Get accent color - balanced colors for the clean layout
+  const accentColor = task.context === 'work' ? '#2563eb' : '#52c41a';
 
   // Get subtask progress for parent tasks
   const progress = isParentTask(task) ? getSubtaskProgress(task) : null;
@@ -332,17 +349,19 @@ const TaskCard: React.FC<{
   // Determine if this task can be expanded
   const canExpand = isParentTask(task);
 
-  // Card styles with grid layout
+  // Card styles with grid layout - adjust columns for progress indicator
+  const gridColumns = progress ? '56px 1fr 60px 100px' : '56px 1fr 100px';
+
   const cardStyle: React.CSSProperties = {
     height: isSubtask ? '36px' : '48px', // Subtasks are smaller
     display: 'grid',
-    gridTemplateColumns: '56px 1fr 100px',
+    gridTemplateColumns: gridColumns,
     alignItems: 'center',
     backgroundColor: isSubtask ? '#242438' : '#2a2a3e', // Subtasks slightly darker
-    borderLeft: `${isSubtask ? '8px' : '12px'} solid ${accentColor}`, // Thinner border for subtasks
-    borderTop: `2px solid ${accentColor}`,
-    borderRight: `2px solid ${accentColor}`,
-    borderBottom: `2px solid ${accentColor}`,
+    borderLeft: `${isSubtask ? '6px' : '9px'} solid ${accentColor}`, // 25% thinner borders
+    borderTop: `1px solid ${accentColor}`,
+    borderRight: `1px solid ${accentColor}`,
+    borderBottom: `1px solid ${accentColor}`,
     borderRadius: '16px',
     marginBottom: '12px',
     marginLeft: isSubtask ? '24px' : '0px', // Indent subtasks
@@ -366,22 +385,7 @@ const TaskCard: React.FC<{
           alignItems: 'center',
           height: '100%',
         }}>
-          {canExpand ? (
-            // Expansion indicator for parent tasks
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{
-                fontSize: '12px',
-                color: '#ffffff',
-                transform: task.isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
-                transition: 'transform 0.2s ease',
-              }}>
-                ▶
-              </span>
-              {getStateIcon()}
-            </div>
-          ) : (
-            getStateIcon()
-          )}
+          {getStateIcon()}
         </div>
 
         {/* Title Column - Flexible, truncated */}
@@ -401,15 +405,14 @@ const TaskCard: React.FC<{
           </h3>
         </div>
 
-        {/* Priority/Progress Column - Fixed 100px */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          paddingRight: '12px',
-        }}>
-          {progress ? (
-            // Show progress for parent tasks with subtasks
+        {/* Progress Column - Fixed 60px (only for parent tasks with subtasks) */}
+        {progress && (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingRight: '8px',
+          }}>
             <div style={{
               fontSize: '12px',
               color: '#ffffff',
@@ -420,13 +423,20 @@ const TaskCard: React.FC<{
             }}>
               [{progress.completed}/{progress.total}]
             </div>
-          ) : (
-            // Show priority slider for tasks without subtasks or subtasks themselves
-            <PrioritySlider
-              priority={priority}
-              onChange={handlePriorityChange}
-            />
-          )}
+          </div>
+        )}
+
+        {/* Priority Column - Fixed 100px (always present) */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingRight: '12px',
+        }}>
+          <PrioritySlider
+            priority={priority}
+            onChange={handlePriorityChange}
+          />
         </div>
       </div>
 
