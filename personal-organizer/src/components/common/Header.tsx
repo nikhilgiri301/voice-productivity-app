@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IconButton, Chip } from '@/components/common';
 
-export type ContextMode = 'work' | 'personal';
+export type ContextMode = 'work' | 'personal' | 'both';
 
 export interface HeaderProps {
   currentContext?: ContextMode;
@@ -11,7 +11,7 @@ export interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({
-  currentContext = 'work',
+  currentContext = 'both',
   onContextChange,
   userName = 'User',
   className = '',
@@ -58,6 +58,65 @@ const Header: React.FC<HeaderProps> = ({
 
   const handleContextToggle = (context: ContextMode): void => {
     onContextChange?.(context);
+  };
+
+  // Context Slider Component
+  const ContextSlider: React.FC = () => {
+    const getSliderPosition = () => {
+      switch (currentContext) {
+        case 'work': return '0%';
+        case 'both': return '50%';
+        case 'personal': return '100%';
+        default: return '0%';
+      }
+    };
+
+    const getSliderColor = () => {
+      switch (currentContext) {
+        case 'work': return '#2563eb'; // Work blue
+        case 'personal': return '#52c41a'; // Personal green
+        case 'both': return '#6b7280'; // Neutral gray
+        default: return '#2563eb';
+      }
+    };
+
+    const handleSliderClick = (e: React.MouseEvent<HTMLDivElement>) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = x / rect.width;
+
+      if (percentage < 0.33) {
+        handleContextToggle('work');
+      } else if (percentage > 0.67) {
+        handleContextToggle('personal');
+      } else {
+        handleContextToggle('both');
+      }
+    };
+
+    return (
+      <div className="flex items-center gap-3">
+        <span className="text-micro text-text-secondary">Work</span>
+        <div
+          className="relative w-16 h-6 bg-bg-card rounded-full cursor-pointer transition-all duration-200"
+          onClick={handleSliderClick}
+        >
+          {/* Slider Track */}
+          <div className="absolute inset-0 rounded-full border border-border-default" />
+
+          {/* Slider Handle */}
+          <div
+            className="absolute top-0.5 w-5 h-5 rounded-full transition-all duration-200 shadow-sm"
+            style={{
+              left: `calc(${getSliderPosition()} - 10px)`,
+              backgroundColor: getSliderColor(),
+              transform: currentContext === 'both' ? 'translateX(-50%)' : 'translateX(0)'
+            }}
+          />
+        </div>
+        <span className="text-micro text-text-secondary">Personal</span>
+      </div>
+    );
   };
 
   const headerClasses = [
@@ -127,28 +186,9 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Context Toggle */}
+        {/* Context Slider */}
         <div className='flex items-center justify-between'>
-          <div className='flex gap-2'>
-            <Chip
-              variant='context'
-              color='work'
-              size='md'
-              active={currentContext === 'work'}
-              onClick={() => handleContextToggle('work')}
-            >
-              Work
-            </Chip>
-            <Chip
-              variant='context'
-              color='personal'
-              size='md'
-              active={currentContext === 'personal'}
-              onClick={() => handleContextToggle('personal')}
-            >
-              Personal
-            </Chip>
-          </div>
+          <ContextSlider />
 
           {/* Voice Input Placeholder */}
           <IconButton
