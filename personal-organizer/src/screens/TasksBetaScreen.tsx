@@ -307,7 +307,7 @@ const TaskCard: React.FC<{
             <div
               className="w-0 h-0 ml-0.5"
               style={{
-                borderLeft: `7px solid ${isSubtask ? '#242438' : '#2a2a3e'}`, // dark background color
+                borderLeft: `7px solid #0f0f23`, // page background color
                 borderTop: '5px solid transparent',
                 borderBottom: '5px solid transparent',
               }}
@@ -322,7 +322,7 @@ const TaskCard: React.FC<{
               className="w-3.5 h-3.5"
               fill="currentColor"
               viewBox="0 0 20 20"
-              style={{ color: isSubtask ? '#242438' : '#2a2a3e' }}
+              style={{ color: '#0f0f23' }}
             >
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>
@@ -334,11 +334,11 @@ const TaskCard: React.FC<{
           <div className="w-5 h-5 border-2 border-text-secondary bg-text-secondary rounded flex items-center justify-center gap-0.5">
             <div
               className="w-0.5 h-3 rounded-full"
-              style={{ backgroundColor: isSubtask ? '#242438' : '#2a2a3e' }}
+              style={{ backgroundColor: '#0f0f23' }}
             />
             <div
               className="w-0.5 h-3 rounded-full"
-              style={{ backgroundColor: isSubtask ? '#242438' : '#2a2a3e' }}
+              style={{ backgroundColor: '#0f0f23' }}
             />
           </div>
         );
@@ -383,7 +383,7 @@ const TaskCard: React.FC<{
     display: 'grid',
     gridTemplateColumns: gridColumns,
     alignItems: 'center',
-    backgroundColor: isSubtask ? '#242438' : '#2a2a3e', // Subtasks slightly darker
+    backgroundColor: '#0f0f23', // Same as page background
     borderLeft: `${isSubtask ? '6px' : '9px'} solid ${accentColor}`, // 25% thinner borders
     borderTop: `1px solid ${accentColor}`,
     borderRight: `1px solid ${accentColor}`,
@@ -427,6 +427,8 @@ const TaskCard: React.FC<{
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             textDecoration: task.state === 'completed' ? 'line-through' : 'none', // Strikethrough for completed tasks
+            textDecorationThickness: task.state === 'completed' ? '2px' : 'auto', // 2px thickness
+            textDecorationColor: task.state === 'completed' ? '#ffffff' : 'auto', // White strikethrough line
           }}>
             {task.title}
           </h3>
