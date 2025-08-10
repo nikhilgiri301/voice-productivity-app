@@ -426,6 +426,7 @@ const TaskCard: React.FC<{
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
+            textDecoration: task.state === 'completed' ? 'line-through' : 'none', // Strikethrough for completed tasks
           }}>
             {task.title}
           </h3>
